@@ -56,7 +56,7 @@ export default function Navbar() {
         <Link href="/" aria-label="Homepage" className="flex items-center">
           <Image
             src="/logo.png"
-            alt="Abhi Ideas Logo"
+            alt="Movira Industries Logo"
             quality={100}
             width={240}
             height={80}

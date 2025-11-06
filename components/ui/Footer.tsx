@@ -10,7 +10,7 @@ const Footer = () => {
             src="/movira-logo-png2.png"
             width={190}
             height={190}
-            alt="Abhi Ideas Logo"
+            alt="Movira Industries Logo"
             priority
           />
         </div>
@@ -24,7 +24,7 @@ const Footer = () => {
             <a href="tel:+918767160087" className="block hover:text-[#C2A356] transition">
               +91 8291 5272 07
             </a>
-            <a href="mailto:design@abhiideas.com" className="block hover:text-[#C2A356] transition">
+            <a href="mailto:info@moviraindustries.in" className="block hover:text-[#C2A356] transition">
               info@moviraindustries.in
             </a>
           </div>

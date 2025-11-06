@@ -71,7 +71,7 @@ function Hero() {
             </p>
             <Link
               href="/about"
-              aria-label="Learn more about Abhi Ideas"
+              aria-label="Learn more about Movira Industries"
               className="group text-md py-2 w-max flex items-center px-6 mx-auto sm:mx-0 uppercase font-Int text-[#EAEAEA] bg-[#1C1C1C] cursor-pointer"
             >
               <span>More About Us</span>
