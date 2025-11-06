@@ -17,7 +17,7 @@ export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.id }));
 }
 
-export default function ProductPage({
+export default async function ProductPage({
   params,
 }: {
   params: { slug: string };
