@@ -1,0 +1,72 @@
+[
+  {
+    "id": "cuplock-vertical-3m",
+    "title": "M.S Cuplock Vertical – 3M",
+    "category": "M.S Cuplock",
+    "specs": "3M Standard",
+    "description": "Durable 3-meter MS Cuplock Standard designed for maximum load-bearing strength. Ideal for tall scaffolding structures, ensuring safety and stability on construction sites. Hot-dip galvanized or painted finish for long life and corrosion resistance.",
+    "features": [
+      "High-strength mild steel construction",
+      "Hot-dip galvanized for corrosion protection",
+      "Easy cup-joint assembly system",
+      "Perfect for tall and heavy-duty scaffolding"
+    ],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "ledger-2m",
+    "title": "M.S Cuplock Ledger – 2M",
+    "category": "M.S Cuplock",
+    "specs": "2M Ledger",
+    "description": "High-strength 2-meter MS Cuplock Ledger designed to provide horizontal support and stability in scaffolding systems.",
+    "features": [
+      "Durable and rigid design",
+      "Precision joints ensure secure fit",
+      "Made from high-quality mild steel",
+      "Long-lasting and easy to assemble"
+    ],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "u-jack-600mm",
+    "title": "U Jack – 600mm",
+    "category": "M.S Cuplock",
+    "specs": "600mm Adjustable",
+    "description": "Strong and reliable 600mm adjustable U Jack ideal for leveling and height correction in scaffolding systems.",
+    "features": [
+      "Precision-threaded rod for smooth adjustment",
+      "Superior load capacity",
+      "Compatible with all Cuplock systems",
+      "Corrosion-resistant steel body"
+    ],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "formwork-slab",
+    "title": "Aluminium Formwork – Slab",
+    "category": "Aluminium Formwork",
+    "specs": "Custom Size",
+    "description": "Durable aluminum and steel Mivan panels for formwork systems. Known for speed, precision, and smooth concrete finish. Ideal for modern construction projects and repetitive casting.",
+    "features": [
+      "Lightweight aluminum panels",
+      "Fast assembly and high precision",
+      "Smooth finish with reusable panels",
+      "Ideal for repetitive concrete casting"
+    ],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "h-frame",
+    "title": "H Frame",
+    "category": "Miscellaneous",
+    "specs": "Standard",
+    "description": "Rigid MS H Frame designed for easy assembly and vertical alignment. Commonly used for plastering, painting, and façade work.",
+    "features": [
+      "Quick setup and dismantling",
+      "Strong mild steel construction",
+      "Stable and secure vertical alignment",
+      "Reusable and long-lasting"
+    ],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+  }
+]
