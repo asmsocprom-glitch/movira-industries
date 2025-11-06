@@ -13,20 +13,22 @@ interface Product {
   image: string;
 }
 
+interface ProductPageProps {
+  params: {
+    slug: string;
+  };
+}
+
 export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.id }));
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const product: Product | undefined = products.find(
-    (p) => p.id === params.slug
-  );
+export default async function ProductPage({ params }: ProductPageProps) {
+  const product = products.find((p:Product) => p.id === params.slug);
 
-  if (!product) return notFound();
+  if (!product) {
+    return notFound();
+  }
 
   return (
     <main className="bg-[#F8F8F8] min-h-screen py-16 px-4 md:px-12 lg:px-24 text-[#1C1C1C] font-Int">
@@ -54,10 +56,10 @@ export default async function ProductPage({
 
           {/* Features List */}
           <ul className="space-y-2 mb-8">
-            {product.features.map((f, i) => (
-              <li key={i} className="flex items-start gap-3">
+            {product.features.map((feature, index) => (
+              <li key={index} className="flex items-start gap-3">
                 <span className="text-[#1C1C1C] font-bold">•</span>
-                <span>{f}</span>
+                <span>{feature}</span>
               </li>
             ))}
           </ul>
