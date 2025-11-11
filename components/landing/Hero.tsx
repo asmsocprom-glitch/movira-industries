@@ -25,7 +25,7 @@ function Hero() {
           alt="Modern architectural building with sleek design"
           fill
           priority
-          className="absolute inset-0 object-cover brightness-60"
+          className="absolute inset-0 object-cover brightness-40"
         />
         {/* Overlay Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center font-Play">
@@ -33,8 +33,15 @@ function Hero() {
             Built with Trust
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl max-w-[90%] sm:max-w-[80%] md:max-w-[50%] my-4 sm:my-6">
-            Movira Industries is Powering India’s infrastructure with trusted scaffolding and formwork expertise
+            Movira connects suppliers and builders through a seamless digital marketplace for all construction materials
           </p>
+          <Link
+            aria-label="Schedule a 30-minute meeting "
+            href="https://calendly.com/asmsocprom/30min"
+            className="mt-6 sm:mt-10 px-4 py-2 text-sm sm:px-10 sm:py-3 sm:text-base border-2 tracking-wider font-semibold border-[#EAEAEA] backdrop-blur-2xl hover:bg-[#1C1C1C] hover:border-[#1C1C1C] transition duration-300 "
+          >
+            Schedule a Meeting
+          </Link>
           <button
               onClick={handleScroll}
               className=" h-8 lg:h-10 absolute bottom-32 md:bottom-8 animate-bounce"

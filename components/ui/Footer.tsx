@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#1C1C1C] font-Int text-white px-6 py-6 ">
+    <footer id="footer" className="bg-[#1C1C1C] font-Int text-white px-6 py-6 ">
       <div className="flex flex-col justify-between items-center gap-6">
         {/* Left: Logo and Address */}
         <div className="space-y-1 max-w-sm">
@@ -21,7 +21,7 @@ const Footer = () => {
         {/* Middle: Contact Info */}
         <div className="space-y-4 flex flex-col justify-between items-center md:text-center text-sm opacity-90">
           <div className="flex gap-5 pb-2">
-            <a href="tel:+918767160087" className="block hover:text-[#C2A356] transition">
+            <a href="tel:+918291527207" className="block hover:text-[#C2A356] transition">
               +91 8291 5272 07
             </a>
             <a href="mailto:info@moviraindustries.in" className="block hover:text-[#C2A356] transition">

@@ -11,7 +11,7 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
+  { label: "About Us", href: "/about" },
   { label: "Shop All", href: "/products" },
 ];
 
@@ -42,7 +42,10 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+   const scrollToFooter = () => {
+    const footer = document.getElementById("footer");
+    footer?.scrollIntoView({ behavior: "smooth" });
+  };
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-30 uppercase font-Play text-white transition-colors duration-500 ease-in-out ${
@@ -55,13 +58,13 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" aria-label="Homepage" className="flex items-center">
           <Image
-            src="/logo.png"
+            src="/movira-logo-png2.png"
             alt="Movira Industries Logo"
             quality={100}
             width={240}
             height={80}
             priority
-            className="h-18 lg:h-24 mt-4 w-auto -translate-y-2 object-contain"
+            className="h-18 lg:h-24 mt-4 w-auto -translate-y-1 object-contain"
           />
         </Link>
 
@@ -75,6 +78,13 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          <button
+            onClick={scrollToFooter}
+            className="uppercase cursor-pointer"
+          >
+            Contact Us
+            <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
+          </button>
         </ul>
 
         {/* Hamburger Icon */}
@@ -119,7 +129,7 @@ export default function Navbar() {
         aria-hidden={!isOpen}
       >
         <div className="flex justify-between items-center p-4 border-b border-gray-500">
-          <span className="text-xl font-semibold">Menu</span>
+          <span className="text-xl font-semibold">Options</span>
           <button
             onClick={closeMenu}
             aria-label="Close mobile menu"

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import TopSection from "@/components/ui/TopSection";
 
-// Product Data (condensed version from your inventory — you can expand later)
+// Product Data (condensed version from your inventory you can expand later)
 const allProducts = [
   // M.S Cuplock
   {

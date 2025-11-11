@@ -41,14 +41,10 @@ const About = () => {
             </p>
 
             <p>
-              With a comprehensive range of rental and supply options — including
+              With a comprehensive range of rental and supply options including
               cuplock systems, adjustable props, mild steel accessories, and custom
-              structural components — we offer end-to-end solutions that enhance site
-              efficiency and ensure worker safety.
-            </p>
-
-            <p>
-              Every product is rigorously inspected, maintained, and ready for
+              structural components we offer end-to-end solutions that enhance site
+              efficiency and ensure worker safety. Every product is rigorously inspected, maintained, and ready for
               deployment, ensuring projects are executed with confidence, on time,
               and within budget.
             </p>
@@ -56,7 +52,7 @@ const About = () => {
             <p>
               Backed by technical expertise, customer-first service, and a passion
               for quality, Movira Industries continues to strengthen its presence as
-              a trusted partner in India’s construction ecosystem — building stronger,
+              a trusted partner in India’s construction ecosystem building stronger,
               safer, and smarter infrastructure for the future.
             </p>
           </div>

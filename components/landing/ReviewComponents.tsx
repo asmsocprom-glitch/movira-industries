@@ -5,7 +5,7 @@ import React from 'react';
 const reviews = [
   {
     message:
-      "Good quality material and always on time. We use Movira for all our scaffolding needs now — very professional people to deal with.",
+      "Good quality material and always on time. We use Movira for all our scaffolding needs now very professional people to deal with.",
     name: "Nikhilesh Jain<br />Tarksyaa Techo Pvt. Ltd.",
   },
   {
@@ -15,7 +15,7 @@ const reviews = [
   },
   {
     message:
-      "Very good experience. Material was in top condition and delivered fast. Their team is polite and easy to talk to — real professionals.",
+      "Very good experience. Material was in top condition and delivered fast. Their team is polite and easy to talk to real professionals.",
     name: "Team MIPPL<br />Mumbai, India",
   },
 ];
