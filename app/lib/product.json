@@ -1,72 +1,137 @@
 [
   {
-    "id": "cuplock-vertical-3m",
-    "title": "M.S Cuplock Vertical – 3M",
+    "id": "cuplock-vertical",
+    "slug": "cuplock-vertical",
+    "title": "M.S Cuplock Vertical",
     "category": "M.S Cuplock",
-    "specs": "3M Standard",
-    "description": "Durable 3-meter MS Cuplock Standard designed for maximum load-bearing strength. Ideal for tall scaffolding structures, ensuring safety and stability on construction sites. Hot-dip galvanized or painted finish for long life and corrosion resistance.",
+    "description": "Durable MS Cuplock Standards providing maximum load-bearing strength and stability on tall structures. Designed for fast assembly and long life with corrosion-resistant finish.",
     "features": [
       "High-strength mild steel construction",
       "Hot-dip galvanized for corrosion protection",
-      "Easy cup-joint assembly system",
-      "Perfect for tall and heavy-duty scaffolding"
+      "Cup-joint assembly ensures quick setup",
+      "Ideal for tall and heavy-duty scaffolding"
     ],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+    "variants": ["1.5M", "2M", "2.5M", "3M"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
   },
   {
-    "id": "ledger-2m",
-    "title": "M.S Cuplock Ledger – 2M",
+    "id": "cuplock-ledger",
+    "slug": "cuplock-ledger",
+    "title": "M.S Cuplock Ledger",
     "category": "M.S Cuplock",
-    "specs": "2M Ledger",
-    "description": "High-strength 2-meter MS Cuplock Ledger designed to provide horizontal support and stability in scaffolding systems.",
+    "description": "High-strength ledgers offering horizontal support and alignment in modular scaffolding systems. Built to deliver consistent stability and durability.",
     "features": [
-      "Durable and rigid design",
       "Precision joints ensure secure fit",
       "Made from high-quality mild steel",
-      "Long-lasting and easy to assemble"
+      "Resists bending under load",
+      "Easy to assemble and dismantle"
     ],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+    "variants": ["1M", "1.5M", "2M"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
   },
   {
-    "id": "u-jack-600mm",
-    "title": "U Jack – 600mm",
+    "id": "u-jack",
+    "slug": "u-jack",
+    "title": "U Jack",
     "category": "M.S Cuplock",
-    "specs": "600mm Adjustable",
-    "description": "Strong and reliable 600mm adjustable U Jack ideal for leveling and height correction in scaffolding systems.",
+    "description": "Precision-threaded adjustable U Jack for accurate leveling and height adjustment in scaffolding systems. Essential for achieving stability on uneven surfaces.",
     "features": [
       "Precision-threaded rod for smooth adjustment",
       "Superior load capacity",
       "Compatible with all Cuplock systems",
       "Corrosion-resistant steel body"
     ],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+    "variants": ["450mm", "600mm", "750mm"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
   },
   {
     "id": "formwork-slab",
+    "slug": "formwork-slab",
     "title": "Aluminium Formwork – Slab",
     "category": "Aluminium Formwork",
-    "specs": "Custom Size",
-    "description": "Durable aluminum and steel Mivan panels for formwork systems. Known for speed, precision, and smooth concrete finish. Ideal for modern construction projects and repetitive casting.",
+    "description": "Durable Mivan panels ensuring precision, speed, and smooth concrete finishes. Perfect for repetitive casting and modern building applications.",
     "features": [
-      "Lightweight aluminum panels",
-      "Fast assembly and high precision",
-      "Smooth finish with reusable panels",
-      "Ideal for repetitive concrete casting"
+      "Lightweight and easy to handle",
+      "Fast assembly with tight tolerances",
+      "Reusable for multiple projects",
+      "Smooth concrete finish every time"
     ],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+    "variants": ["Standard", "Custom"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "formwork-wall",
+    "slug": "formwork-wall",
+    "title": "Aluminium Formwork – Wall",
+    "category": "Aluminium Formwork",
+    "description": "Robust wall panels designed for consistent and precise wall casting, ensuring faster and smoother project execution.",
+    "features": [
+      "Lightweight and strong aluminum frame",
+      "Fast assembly and disassembly",
+      "Excellent concrete surface finish",
+      "Customizable to any structure layout"
+    ],
+    "variants": ["Standard", "Custom"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "pipe-round",
+    "slug": "pipe-round",
+    "title": "MS Round Pipe",
+    "category": "MS Pipes",
+    "description": "Heavy-duty round pipes suitable for scaffolding, bracing, and general construction use. Designed for strength and durability under load.",
+    "features": [
+      "Manufactured with precision tolerances",
+      "Resistant to corrosion and bending",
+      "Suitable for structural and industrial use",
+      "Available in multiple sizes and thicknesses"
+    ],
+    "variants": ["3M", "6M"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "pipe-c-channel",
+    "slug": "pipe-c-channel",
+    "title": "MS C Channel",
+    "category": "MS Pipes",
+    "description": "Durable MS C Channels used for fabrication, reinforcement, and support structures. Ideal for framing and load-bearing applications.",
+    "features": [
+      "Uniform section and high strength",
+      "Corrosion-resistant finish",
+      "Precision-rolled mild steel construction",
+      "Ideal for structural fabrication work"
+    ],
+    "variants": ["3M", "6M"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
+  },
+  {
+    "id": "walkway-jali",
+    "slug": "walkway-jali",
+    "title": "Walkway Jali",
+    "category": "Miscellaneous",
+    "description": "Anti-slip galvanized MS walkway jali for safe and stable movement at construction sites and elevated work areas.",
+    "features": [
+      "High grip anti-slip design",
+      "Corrosion-resistant galvanized steel",
+      "Strong and lightweight",
+      "Easy to install and remove"
+    ],
+    "variants": ["Standard", "Custom"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
   },
   {
     "id": "h-frame",
+    "slug": "h-frame",
     "title": "H Frame",
     "category": "Miscellaneous",
-    "specs": "Standard",
-    "description": "Rigid MS H Frame designed for easy assembly and vertical alignment. Commonly used for plastering, painting, and façade work.",
+    "description": "Rigid MS H Frame for plastering, painting, and façade work. Provides easy setup, strong vertical alignment, and long-term durability.",
     "features": [
       "Quick setup and dismantling",
-      "Strong mild steel construction",
-      "Stable and secure vertical alignment",
-      "Reusable and long-lasting"
+      "High load-bearing capacity",
+      "Stable and secure alignment",
+      "Reusable for multiple site operations"
     ],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=784"
+    "variants": ["Standard", "Heavy Duty"],
+    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
   }
 ]
