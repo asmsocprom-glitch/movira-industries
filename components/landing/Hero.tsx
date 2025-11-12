@@ -21,7 +21,7 @@ function Hero() {
       {/* Hero Section with Background Image */}
       <header className="relative w-full h-screen text-[#EAEAEA]">
         <Image
-          src="/hero3.jpg"
+          src="/hero-new.jpg"
           alt="Modern architectural building with sleek design"
           fill
           priority
