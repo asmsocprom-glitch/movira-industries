@@ -24,10 +24,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Movira-Industry",
+  title: "Movira Industries",
   description: "Movira Industries LLP is a premier provider of scaffolding and formwork solutions, dedicated to powering India’s construction and infrastructure growth. We specialize in delivering high-quality, reliable, and safe equipment that meets the diverse needs of contractors, builders, and large-scale infrastructure developers.",
   icons: {
-    icon: "/favicon.ico", // Path to the favicon in your public folder
+    icon: "/favicon.ico", 
   },
 };
 

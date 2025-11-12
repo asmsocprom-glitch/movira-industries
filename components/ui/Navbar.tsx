@@ -48,7 +48,7 @@ export default function Navbar() {
   };
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-30 uppercase font-Play text-white transition-colors duration-500 ease-in-out ${
+      className={`fixed top-0 left-0 w-full py-4 z-30 uppercase font-Play text-white transition-colors duration-500 ease-in-out ${
         scrolled ? "bg-[#1C1C1C] shadow-lg" : "bg-transparent"
       }`}
       role="navigation"
@@ -58,14 +58,17 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" aria-label="Homepage" className="flex items-center">
           <Image
-            src="/movira-logo-png2.png"
+            src="/logo2.png"
             alt="Movira Industries Logo"
             quality={100}
-            width={240}
-            height={80}
+            width={100}
+            height={100}
             priority
-            className="h-18 lg:h-24 mt-4 w-auto -translate-y-1 object-contain"
+            className="h-12 p-1 w-auto object-contain"
           />
+          <span className="px-4 text-md lg:text-2xl">
+            Movira Industries 
+          </span>
         </Link>
 
         {/* Desktop Nav */}
