@@ -6,7 +6,6 @@ import React from "react";
 import products from "@/app/lib/product.json";
 
 export default function FeaturedProducts() {
-  // Show only first 4 products (or you can later use a "featured" field)
   const featuredProducts = products.slice(0, 4);
 
   return (
@@ -16,8 +15,8 @@ export default function FeaturedProducts() {
           Featured Products
         </h2>
         <p className="text-[#333333] text-base md:text-lg max-w-2xl mx-auto">
-          A quick look at some of our most trusted scaffolding and formwork
-          solutions, built for safety, strength, and precision.
+          A quick look at some of our most trusted scaffolding, formwork, and
+          fabrication systems built for safety and precision.
         </p>
       </div>
 
@@ -28,7 +27,6 @@ export default function FeaturedProducts() {
             key={product.id}
             className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300"
           >
-            {/* Image */}
             <div className="relative w-full h-60">
               <Image
                 src={product.image}
@@ -38,7 +36,6 @@ export default function FeaturedProducts() {
               />
             </div>
 
-            {/* Content */}
             <div className="p-5 flex flex-col justify-between h-72">
               <div>
                 <h3 className="font-Play uppercase text-lg mb-2">
@@ -53,14 +50,13 @@ export default function FeaturedProducts() {
                 href={`/products/${product.slug}`}
                 className="font-Play mt-4 inline-block border-2 border-[#1C1C1C] rounded-sm text-[#1C1C1C] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#1C1C1C] hover:text-[#EAEAEA] transition duration-300 text-center"
               >
-                Enquire Now
+                View Variants
               </Link>
             </div>
           </div>
         ))}
       </div>
 
-      {/* View All Button */}
       <div className="flex justify-center mt-14">
         <Link
           href="/products"

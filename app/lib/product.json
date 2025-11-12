@@ -1,137 +1,152 @@
 [
   {
-    "id": "cuplock-vertical",
-    "slug": "cuplock-vertical",
-    "title": "M.S Cuplock Vertical",
-    "category": "M.S Cuplock",
-    "description": "Durable MS Cuplock Standards providing maximum load-bearing strength and stability on tall structures. Designed for fast assembly and long life with corrosion-resistant finish.",
-    "features": [
-      "High-strength mild steel construction",
-      "Hot-dip galvanized for corrosion protection",
-      "Cup-joint assembly ensures quick setup",
-      "Ideal for tall and heavy-duty scaffolding"
-    ],
-    "variants": ["1.5M", "2M", "2.5M", "3M"],
-    "image": "/MS_Cuplock.jpeg"
+    "id": "ms-cuplock",
+    "slug": "ms-cuplock",
+    "title": "M.S Cuplock",
+    "category": "Scaffolding System",
+    "description": "A modular scaffolding system designed for speed, strength, and versatility. Used widely for construction, formwork, and maintenance operations.",
+    "image": "/MS_Cuplock.jpeg",
+    "variants": [
+      {
+        "name": "Vertical",
+        "description": "Durable MS Cuplock Standards providing maximum load-bearing strength and stability on tall structures.",
+        "features": [
+          "High-strength mild steel construction",
+          "Hot-dip galvanized for corrosion protection",
+          "Cup-joint assembly ensures quick setup",
+          "Ideal for tall and heavy-duty scaffolding"
+        ],
+        "specifications": ["1.5M", "2M", "2.5M", "3M"]
+      },
+      {
+        "name": "Ledger",
+        "description": "High-strength ledgers offering horizontal support and alignment in modular scaffolding systems.",
+        "features": [
+          "Precision joints ensure secure fit",
+          "Made from high-quality mild steel",
+          "Resists bending under load",
+          "Easy to assemble and dismantle"
+        ],
+        "specifications": ["1M", "1.5M", "2M"]
+      },
+      {
+        "name": "U Jack",
+        "description": "Precision-threaded adjustable U Jack for accurate leveling and height adjustment in scaffolding systems.",
+        "features": [
+          "Precision-threaded rod for smooth adjustment",
+          "Superior load capacity",
+          "Compatible with all Cuplock systems",
+          "Corrosion-resistant steel body"
+        ],
+        "specifications": ["450mm", "600mm", "750mm"]
+      },
+      {
+        "name": "Base Jack",
+        "description": "Adjustable base jack providing a stable foundation for scaffolding on uneven surfaces.",
+        "features": [
+          "Threaded rod for height adjustment",
+          "Heavy-duty load capacity",
+          "Prevents movement on uneven ground",
+          "Corrosion-resistant finish"
+        ],
+        "specifications": ["450mm", "600mm"]
+      }
+    ]
   },
   {
-    "id": "cuplock-ledger",
-    "slug": "cuplock-ledger",
-    "title": "M.S Cuplock Ledger",
-    "category": "M.S Cuplock",
-    "description": "High-strength ledgers offering horizontal support and alignment in modular scaffolding systems. Built to deliver consistent stability and durability.",
-    "features": [
-      "Precision joints ensure secure fit",
-      "Made from high-quality mild steel",
-      "Resists bending under load",
-      "Easy to assemble and dismantle"
-    ],
-    "variants": ["1M", "1.5M", "2M"],
-    "image": "/Ledger.png"
+    "id": "aluminium-formwork",
+    "slug": "aluminium-formwork",
+    "title": "Aluminium Formwork",
+    "category": "Formwork System",
+    "description": "Lightweight yet strong aluminum panels used for fast and efficient casting of walls and slabs with precision and durability.",
+    "image": "/Aluminum.jpeg",
+    "variants": [
+      {
+        "name": "Slab Panel",
+        "description": "Durable Mivan panels ensuring precision, speed, and smooth concrete finishes.",
+        "features": [
+          "Lightweight and easy to handle",
+          "Fast assembly with tight tolerances",
+          "Reusable for multiple projects",
+          "Smooth concrete finish every time"
+        ],
+        "specifications": ["Standard", "Custom"]
+      },
+      {
+        "name": "Wall Panel",
+        "description": "Robust panels designed for consistent and precise wall casting.",
+        "features": [
+          "Lightweight and strong aluminum frame",
+          "Fast assembly and disassembly",
+          "Excellent concrete surface finish",
+          "Customizable to any layout"
+        ],
+        "specifications": ["Standard", "Custom"]
+      }
+    ]
   },
   {
-    "id": "u-jack",
-    "slug": "u-jack",
-    "title": "U Jack",
-    "category": "M.S Cuplock",
-    "description": "Precision-threaded adjustable U Jack for accurate leveling and height adjustment in scaffolding systems. Essential for achieving stability on uneven surfaces.",
-    "features": [
-      "Precision-threaded rod for smooth adjustment",
-      "Superior load capacity",
-      "Compatible with all Cuplock systems",
-      "Corrosion-resistant steel body"
-    ],
-    "variants": ["450mm", "600mm", "750mm"],
-    "image": "/U_Jacl.jpeg"
+    "id": "ms-pipes",
+    "slug": "ms-pipes",
+    "title": "MS Pipes & Channels",
+    "category": "Steel Fabrication",
+    "description": "Heavy-duty pipes and channels ideal for scaffolding, bracing, and fabrication use, ensuring long-lasting performance.",
+    "image": "/Ms_Pipes.jpeg",
+    "variants": [
+      {
+        "name": "Round Pipe",
+        "description": "Heavy-duty round pipes suitable for scaffolding and general construction use.",
+        "features": [
+          "Manufactured with precision tolerances",
+          "Resistant to corrosion and bending",
+          "Suitable for structural and industrial use",
+          "Available in multiple sizes and thicknesses"
+        ],
+        "specifications": ["3M", "6M"]
+      },
+      {
+        "name": "C Channel",
+        "description": "Durable MS C Channels used for framing, reinforcement, and support structures.",
+        "features": [
+          "Uniform section and high strength",
+          "Corrosion-resistant finish",
+          "Precision-rolled mild steel construction",
+          "Ideal for fabrication work"
+        ],
+        "specifications": ["3M", "6M"]
+      }
+    ]
   },
   {
-    "id": "formwork-slab",
-    "slug": "formwork-slab",
-    "title": "Aluminium Formwork – Slab",
-    "category": "Aluminium Formwork",
-    "description": "Durable Mivan panels ensuring precision, speed, and smooth concrete finishes. Perfect for repetitive casting and modern building applications.",
-    "features": [
-      "Lightweight and easy to handle",
-      "Fast assembly with tight tolerances",
-      "Reusable for multiple projects",
-      "Smooth concrete finish every time"
-    ],
-    "variants": ["Standard", "Custom"],
-    "image": "/Aluminum.jpeg"
-  },
-  {
-    "id": "formwork-wall",
-    "slug": "formwork-wall",
-    "title": "Aluminium Formwork – Wall",
-    "category": "Aluminium Formwork",
-    "description": "Robust wall panels designed for consistent and precise wall casting, ensuring faster and smoother project execution.",
-    "features": [
-      "Lightweight and strong aluminum frame",
-      "Fast assembly and disassembly",
-      "Excellent concrete surface finish",
-      "Customizable to any structure layout"
-    ],
-    "variants": ["Standard", "Custom"],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
-  },
-  {
-    "id": "pipe-round",
-    "slug": "pipe-round",
-    "title": "MS Round Pipe",
-    "category": "MS Pipes",
-    "description": "Heavy-duty round pipes suitable for scaffolding, bracing, and general construction use. Designed for strength and durability under load.",
-    "features": [
-      "Manufactured with precision tolerances",
-      "Resistant to corrosion and bending",
-      "Suitable for structural and industrial use",
-      "Available in multiple sizes and thicknesses"
-    ],
-    "variants": ["3M", "6M"],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
-  },
-  {
-    "id": "pipe-c-channel",
-    "slug": "pipe-c-channel",
-    "title": "MS C Channel",
-    "category": "MS Pipes",
-    "description": "Durable MS C Channels used for fabrication, reinforcement, and support structures. Ideal for framing and load-bearing applications.",
-    "features": [
-      "Uniform section and high strength",
-      "Corrosion-resistant finish",
-      "Precision-rolled mild steel construction",
-      "Ideal for structural fabrication work"
-    ],
-    "variants": ["3M", "6M"],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
-  },
-  {
-    "id": "walkway-jali",
-    "slug": "walkway-jali",
-    "title": "Walkway Jali",
-    "category": "Miscellaneous",
-    "description": "Anti-slip galvanized MS walkway jali for safe and stable movement at construction sites and elevated work areas.",
-    "features": [
-      "High grip anti-slip design",
-      "Corrosion-resistant galvanized steel",
-      "Strong and lightweight",
-      "Easy to install and remove"
-    ],
-    "variants": ["Standard", "Custom"],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
-  },
-  {
-    "id": "h-frame",
-    "slug": "h-frame",
-    "title": "H Frame",
-    "category": "Miscellaneous",
-    "description": "Rigid MS H Frame for plastering, painting, and façade work. Provides easy setup, strong vertical alignment, and long-term durability.",
-    "features": [
-      "Quick setup and dismantling",
-      "High load-bearing capacity",
-      "Stable and secure alignment",
-      "Reusable for multiple site operations"
-    ],
-    "variants": ["Standard", "Heavy Duty"],
-    "image": "https://images.unsplash.com/photo-1519143009590-e3800b9df468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=784"
+    "id": "miscellaneous",
+    "slug": "miscellaneous",
+    "title": "Miscellaneous Equipment",
+    "category": "Accessories",
+    "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
+    "image": "/Jali.jpeg",
+    "variants": [
+      {
+        "name": "Walkway Jali",
+        "description": "Anti-slip galvanized MS walkway jali for safe and stable movement at construction sites.",
+        "features": [
+          "High grip anti-slip design",
+          "Corrosion-resistant galvanized steel",
+          "Strong and lightweight",
+          "Easy to install and remove"
+        ],
+        "specifications": ["Standard", "Custom"]
+      },
+      {
+        "name": "H Frame",
+        "description": "Rigid MS H Frame for plastering, painting, and façade work.",
+        "features": [
+          "Quick setup and dismantling",
+          "High load-bearing capacity",
+          "Stable and secure alignment",
+          "Reusable for multiple site operations"
+        ],
+        "specifications": ["Standard", "Heavy Duty"]
+      }
+    ]
   }
 ]

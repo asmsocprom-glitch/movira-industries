@@ -4,15 +4,21 @@ import Link from "next/link";
 import products from "@/app/lib/product.json";
 import TopSection from "@/components/ui/TopSection";
 
+interface Variant {
+  name: string;
+  description: string;
+  features: string[];
+  specifications: string[];
+}
+
 interface Product {
   id: string;
   slug: string;
   title: string;
   category: string;
   description: string;
-  features: string[];
   image: string;
-  variants?: string[];
+  variants: Variant[];
 }
 
 interface ProductPageProps {
@@ -51,39 +57,45 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.description}
             </p>
 
-            {/* Variants Section */}
-            {product.variants && product.variants.length > 0 && (
-              <div className="mb-10">
-                <h4 className="font-semibold text-lg mb-3">
-                  Available Sizes / Variants:
-                </h4>
-                <div className="flex flex-wrap gap-3">
-                  {product.variants.map((variant) => (
-                    <span
-                      key={variant}
-                      className="border border-[#1C1C1C] rounded-xl px-4 py-2 text-sm hover:bg-[#1C1C1C] hover:text-[#EAEAEA] transition duration-200 cursor-pointer"
-                    >
-                      {variant}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Variants */}
+            {product.variants.map((variant, i) => (
+              <div key={i} className="mb-10 border-b border-gray-300 pb-6">
+                <h2 className="font-Play text-2xl uppercase mb-3">
+                  {variant.name}
+                </h2>
+                <p className="text-[#333333] mb-4">{variant.description}</p>
 
-            {/* Features List */}
-            {product.features && product.features.length > 0 && (
-              <ul className="space-y-2 mb-8">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="text-[#1C1C1C] font-bold">•</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+                {/* Features */}
+                <ul className="space-y-2 mb-4">
+                  {variant.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="text-[#1C1C1C] font-bold">•</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Specifications */}
+                {variant.specifications && variant.specifications.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Specifications:</h4>
+                    <div className="flex flex-wrap gap-3">
+                      {variant.specifications.map((spec) => (
+                        <span
+                          key={spec}
+                          className="border border-[#1C1C1C] rounded-xl px-4 py-2 text-sm hover:bg-[#1C1C1C] hover:text-[#EAEAEA] transition duration-200 cursor-pointer"
+                        >
+                          {spec}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
 
             {/* Buttons */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 mt-10">
               <Link
                 href="https://api.whatsapp.com/send?phone=918291527207"
                 className="px-6 py-3 border-2 border-[#1C1C1C] bg-[#1C1C1C] text-[#EAEAEA] font-semibold uppercase tracking-wide hover:bg-transparent hover:text-[#1C1C1C] transition duration-300"

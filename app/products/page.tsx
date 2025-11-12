@@ -8,10 +8,10 @@ import products from "@/app/lib/product.json";
 
 const categories = [
   "All",
-  "M.S Cuplock",
-  "MS Pipes",
-  "Aluminium Formwork",
-  "Miscellaneous",
+  "Scaffolding System",
+  "Formwork System",
+  "Steel Fabrication",
+  "Accessories",
 ];
 
 export default function ProductsPage() {
@@ -72,7 +72,7 @@ export default function ProductsPage() {
                   href={`/products/${product.slug}`}
                   className="mt-4 inline-block border-2 border-[#1C1C1C] text-[#1C1C1C] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#1C1C1C] hover:text-[#EAEAEA] transition duration-300 text-center"
                 >
-                  View Details
+                  View Variants
                 </Link>
               </div>
             </div>
