@@ -29,7 +29,7 @@ export default function FeaturedProducts() {
           >
             <div className="relative w-full h-60">
               <Image
-                src={product.image}
+                src={product.image[0]}
                 alt={product.title}
                 fill
                 className="object-cover group-hover:scale-105 transition duration-300"
