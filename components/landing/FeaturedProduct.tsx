@@ -29,7 +29,7 @@ export default function FeaturedProducts() {
           >
             <div className="relative w-full h-60">
               <Image
-                src={product.image[0]}
+                src={product.image}
                 alt={product.title}
                 fill
                 className="object-cover group-hover:scale-105 transition duration-300"
@@ -60,7 +60,7 @@ export default function FeaturedProducts() {
       <div className="flex justify-center mt-14">
         <Link
           href="/products"
-          className="px-8 py-3 border-2 border-[#1C1C1C] bg-[#1C1C1C] text-[#EAEAEA] font-semibold uppercase tracking-wide hover:bg-transparent hover:text-[#1C1C1C] transition duration-300"
+          className="px-6 py-2 rounded-2xl text-sm border-2 border-[#1C1C1C] bg-[#1C1C1C] text-[#EAEAEA] font-semibold uppercase tracking-wide hover:bg-transparent hover:text-[#1C1C1C] transition duration-300"
         >
           View All Products
         </Link>

@@ -19,7 +19,7 @@ function Hero() {
   return (
     <main>
       {/* Hero Section with Background Image */}
-      <header className="relative w-full h-screen text-[#EAEAEA]">
+      <header className="relative w-full h-screen text-[#EAEAEA] bg-[#EAE7DC]">
         <Image
           src="/hero-new.jpg"
           alt="Modern architectural building with sleek design"
@@ -29,16 +29,16 @@ function Hero() {
         />
         {/* Overlay Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center font-Play">
-          <h1 className="text-2xl md:text-5xl leading-relaxed uppercase">
-            Built with Trust
+          <h1 className="text-3xl md:text-5xl leading-relaxed uppercase">
+            Built with Trust.
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl max-w-[90%] sm:max-w-[80%] md:max-w-[50%] my-4 sm:my-6">
-            Movira connects suppliers and builders through a seamless digital marketplace for all construction materials
+          <p className="text-md sm:text-xl md:text-2xl max-w-[90%] sm:max-w-[80%] md:max-w-[50%] my-4 sm:my-6">
+            Movira connects suppliers and builders through a seamless digital marketplace for all construction materials.
           </p>
           <Link
             aria-label="Schedule a 30-minute meeting "
             href="https://calendly.com/moviraindustries/30min"
-            className="mt-6 sm:mt-10 px-4 py-2 text-sm sm:px-10 sm:py-3 sm:text-base border-2 tracking-wider font-semibold border-[#EAEAEA] backdrop-blur-2xl hover:bg-[#1C1C1C] hover:border-[#1C1C1C] transition duration-300 "
+            className="mt-4 px-4 py-2 text-md sm:px-10 sm:py-3 border-2 tracking-wider font-semibold border-[#EAEAEA] backdrop-blur-2xl hover:bg-[#1C1C1C] hover:border-[#1C1C1C] transition duration-300 "
           >
             Schedule a Meeting
           </Link>

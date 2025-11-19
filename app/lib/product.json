@@ -5,7 +5,7 @@
     "title": "M.S Cuplock",
     "category": "Scaffolding System",
     "description": "A modular scaffolding system designed for speed, strength, and versatility. Used widely for construction, formwork, and maintenance operations.",
-    "image": ["/MS_Cuplock.jpeg","/Ledger.png"],
+    "image": "/MS_Cuplock.jpeg",
     "variants": [
       {
         "name": "Vertical",
@@ -16,7 +16,9 @@
           "Cup-joint assembly ensures quick setup",
           "Ideal for tall and heavy-duty scaffolding"
         ],
-        "specifications": ["0.5M","1M","1.5M", "2M", "2.5M", "3M"]
+        "specifications": ["0.5M","1M","1.5M", "2M", "2.5M", "3M"],
+        "images":["/MS_Cuplock.jpeg","/Base_Jack.jpeg"]
+        
       },
       {
         "name": "Ledger",
@@ -27,7 +29,8 @@
           "Resists bending under load",
           "Easy to assemble and dismantle"
         ],
-        "specifications": ["550mm","600mm","1M","1.2M","1.5M","1.8M","2M"]
+        "specifications": ["550mm","600mm","1M","1.2M","1.5M","1.8M","2M"],
+        "images":["/Ledger.png"]
       },
       {
         "name": "U Jack",
@@ -38,7 +41,8 @@
           "Compatible with all Cuplock systems",
           "Corrosion-resistant steel body"
         ],
-        "specifications": ["350mm","450mm", "600mm"]
+        "specifications": ["350mm","450mm", "600mm"],
+        "images":["/U_Jacl.jpeg"]
       },
       {
         "name": "Base Jack",
@@ -49,7 +53,8 @@
           "Prevents movement on uneven ground",
           "Corrosion-resistant finish"
         ],
-        "specifications": ["350mm","450mm", "600mm"]
+        "specifications": ["350mm","450mm", "600mm"],
+        "images":["/Base_Jack.jpeg"]
       },
       {
         "name": "MS Adjustable Props",
@@ -59,7 +64,8 @@
           "Easy height adjustment and rapid installation.",
           "Long service life."
         ],
-        "specifications": ["2x2M","2x3M"] 
+        "specifications": ["2x2M","2x3M"],
+        "images":["/MS_Adjustable.jpeg"] 
       }
     ]
   },
@@ -69,7 +75,7 @@
     "title": "Aluminium Formwork",
     "category": "Formwork System",
     "description": "Lightweight yet strong aluminum panels used for fast and efficient casting of walls and slabs with precision and durability.",
-    "image": ["/Aluminum.jpeg"],
+    "image": "/Aluminum.jpeg",
     "variants": [
       {
         "name": "Slab Panel",
@@ -123,7 +129,7 @@
     "title": "MS Pipes & Channels",
     "category": "Steel Fabrication",
     "description": "Heavy-duty pipes and channels ideal for scaffolding, bracing, and fabrication use, ensuring long-lasting performance.",
-    "image": ["/Ms_Pipes.jpeg"],
+    "image": "/Ms_Pipes.jpeg",
     "variants": [
       {
         "name": "Round Pipe",
@@ -177,7 +183,7 @@
     "title": "Miscellaneous Equipment",
     "category": "Accessories",
     "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
-    "image": ["/Jali.jpeg"],
+    "image": "/Jali.jpeg",
     "variants": [
       {
         "name": "Walkway Jali",
@@ -242,7 +248,7 @@
     "title": "Lifts and Screen",
     "category": "Lifting & Safety",
     "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
-    "image": ["/liftsandscreen.jpeg"],
+    "image": "/liftsandscreen.jpeg",
     "variants": [
       {
         "name": "Material Lift",
