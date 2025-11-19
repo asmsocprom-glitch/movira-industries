@@ -8,7 +8,7 @@ interface ProductPageProps {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const product = products.find((p) => p.slug === slug);
 
   if (!product) return notFound();
