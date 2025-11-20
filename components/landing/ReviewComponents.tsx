@@ -30,7 +30,7 @@ export default function ReviewComponent() {
       <div className="relative z-10 max-w-4xl mx-auto text-center mb-16">
         <h2
           id="client-reviews-heading"
-          className="text-3xl sm:text-4xl font-Play font-semibold text-[#1c1c1c]"
+          className="text-[26px] md:text-4xl font-Play font-semibold text-[#1c1c1c]"
         >
           What Our Clients Say
         </h2>
@@ -44,7 +44,7 @@ export default function ReviewComponent() {
         {reviews.map((review, index) => (
           <article
             key={index}
-            className="p-8 rounded-2xl border border-zinc-200 
+            className="p-8 rounded-2xl border border-zinc-400 
                        bg-white/90 backdrop-blur-sm 
                        shadow-[0_4px_20px_rgba(0,0,0,0.08)] 
                        hover:shadow-[0_8px_28px_rgba(194,163,86,0.25)] 

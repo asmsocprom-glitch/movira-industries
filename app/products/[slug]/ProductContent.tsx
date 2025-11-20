@@ -96,18 +96,18 @@ export default function ProductContent({ product }: { product: Product }) {
               {product.description}
             </p>
 
-            {/* CTA BUTTONS — HIGH POSITION + CHIP STYLE */}
-            <div className="flex flex-wrap gap-2 mt-1 mb-6">
+            {/* CTA BUTTONS */}
+            <div className="flex flex-wrap gap-3 mt-4 mb-8">
               <Link
                 href="https://api.whatsapp.com/send?phone=918291527207"
-                className="px-3 py-1.5 rounded-lg text-xs border border-[#1C1C1C]/60 hover:bg-[#1C1C1C] hover:text-white transition"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-black bg-amber-300 border-1 border-gray-800 hover:opacity-70 transition"
               >
                 Enquire Now
               </Link>
 
               <Link
                 href="/products"
-                className="px-3 py-1.5 rounded-lg text-xs border border-[#1C1C1C]/60 hover:bg-[#1C1C1C] hover:text-white transition"
+                className="px-4 py-2 rounded-lg text-sm font-medium border border-[#1C1C1C]/60 hover:bg-[#1C1C1C] hover:text-white transition"
               >
                 Back to Products
               </Link>

@@ -61,60 +61,62 @@ const faqData: FAQItem[] = [
   },
 ];
 
-
 function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const toggleFAQ = (index: number) =>
     setOpenIndex(openIndex === index ? null : index);
 
   return (
-    <section className="h-auto flex justify-center px-4 py-16 bg-[#EAE7DC]">
+    <section className="relative flex justify-center px-4 py-16 bg-[#0a1e2a]">
       <div className="w-full max-w-6xl">
-        <h3 className="text-2xl sm:text-3xl md:text-4xl font-Play font-semibold text-[#1c1c1c] pb-12 text-center tracking-wide">
+        {/* Section Heading */}
+        <h3 className="text-[26px] md:text-4xl font-Play font-semibold text-[#f1f1f1] pb-12 text-center tracking-wide">
           Frequently Asked Questions
         </h3>
 
-<div className="grid grid-cols-1 gap-4 md:gap-6">
-  {faqData.map((faq, index) => (
-    <div
-      key={index}
-      className={`rounded-xl border border-gray-300 shadow-sm transition-all duration-300 hover:shadow-md ${
-        openIndex === index ? "bg-[#f7f5f0]" : "bg-[#f7f5f0]"
-      }`}
-    >
-      <button
-        aria-expanded={openIndex === index}
-        aria-controls={`faq-${index}`}
-        className="w-full py-3 px-4 flex items-center justify-between text-left text-sm sm:text-base font-medium focus:outline-none transition-all cursor-pointer"
-        onClick={() => toggleFAQ(index)}
-      >
-        <span
-          className={`${
-            openIndex === index ? "text-[#1c1c1c]" : "text-gray-700"
-          }`}
-        >
-          {faq.question}
-        </span>
-        {openIndex === index ? (
-          <FiMinus className="text-lg text-[#1c1c1c]" />
-        ) : (
-          <FiPlus className="text-lg text-gray-600" />
-        )}
-      </button>
+        {/* FAQ Cards */}
+        <div className="grid grid-cols-1 gap-6">
+          {faqData.map((faq, index) => (
+            <div
+              key={index}
+              className={`relative rounded-xl bg-[#f0f3f5] shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl`}
+            >
+              <button
+                aria-expanded={openIndex === index}
+                aria-controls={`faq-${index}`}
+                className="w-full py-4 px-6 flex items-center justify-between text-left text-base sm:text-lg font-medium focus:outline-none cursor-pointer transition-colors duration-300"
+                onClick={() => toggleFAQ(index)}
+              >
+                <span
+                  className={`${
+                    openIndex === index
+                      ? "text-[#111827]"
+                      : "text-gray-800"
+                  } transition-colors duration-300`}
+                >
+                  {faq.question}
+                </span>
+                {openIndex === index ? (
+                  <FiMinus className="text-lg text-[#00aaff] transition-transform duration-300" />
+                ) : (
+                  <FiPlus className="text-lg text-[#00aaff] transition-transform duration-300" />
+                )}
+              </button>
 
-      <div
-        id={`faq-${index}`}
-        className={`overflow-hidden text-gray-600 text-sm sm:text-base transition-all duration-300 ease-in-out ${
-          openIndex === index ? "max-h-[300px] pb-3 px-4" : "max-h-0"
-        }`}
-        style={{ transitionProperty: "max-height, padding" }}
-      >
-        <p className="leading-relaxed">{faq.answer}</p>
-      </div>
-    </div>
-  ))}
-</div>
-
+              <div
+                id={`faq-${index}`}
+                className={`overflow-hidden text-gray-700 text-base sm:text-base transition-all duration-300 ease-in-out`}
+                style={{
+                  maxHeight: openIndex === index ? "300px" : "0px",
+                  padding: openIndex === index ? "0.75rem 1.5rem 1.5rem" : "0",
+                  transitionProperty: "max-height, padding",
+                }}
+              >
+                <p className="leading-relaxed">{faq.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

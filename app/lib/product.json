@@ -5,7 +5,7 @@
     "title": "M.S Cuplock",
     "category": "Scaffolding System",
     "description": "A modular scaffolding system designed for speed, strength, and versatility. Used widely for construction, formwork, and maintenance operations.",
-    "image": "/MS_Cuplock.jpeg",
+    "image": "/products/vertical.png",
     "variants": [
       {
         "name": "Vertical",
@@ -17,7 +17,7 @@
           "Ideal for tall and heavy-duty scaffolding"
         ],
         "specifications": ["0.5M","1M","1.5M", "2M", "2.5M", "3M"],
-        "images":["/MS_Cuplock.jpeg","/Base_Jack.jpeg"]
+        "images":["/products/vertical.png"]
         
       },
       {
@@ -30,7 +30,7 @@
           "Easy to assemble and dismantle"
         ],
         "specifications": ["550mm","600mm","1M","1.2M","1.5M","1.8M","2M"],
-        "images":["/Ledger.png"]
+        "images":["/products/ledger2.png"]
       },
       {
         "name": "U Jack",
@@ -42,7 +42,7 @@
           "Corrosion-resistant steel body"
         ],
         "specifications": ["350mm","450mm", "600mm"],
-        "images":["/U_Jacl.jpeg"]
+        "images":["/products/ujack2.png"]
       },
       {
         "name": "Base Jack",
@@ -54,7 +54,7 @@
           "Corrosion-resistant finish"
         ],
         "specifications": ["350mm","450mm", "600mm"],
-        "images":["/Base_Jack.jpeg"]
+        "images":["/products/basejack.png"]
       },
       {
         "name": "MS Adjustable Props",
@@ -65,7 +65,7 @@
           "Long service life."
         ],
         "specifications": ["2x2M","2x3M"],
-        "images":["/MS_Adjustable.jpeg"] 
+        "images":["/products/adjustableprops.png"] 
       }
     ]
   },
@@ -75,7 +75,7 @@
     "title": "Aluminium Formwork",
     "category": "Formwork System",
     "description": "Lightweight yet strong aluminum panels used for fast and efficient casting of walls and slabs with precision and durability.",
-    "image": "/Aluminum.jpeg",
+    "image": "/products/featuredalu.png",
     "variants": [
       {
         "name": "Slab Panel",
@@ -86,7 +86,8 @@
           "Reusable for multiple projects",
           "Smooth concrete finish every time"
         ],
-        "specifications": ["Standard", "Custom"]
+        "specifications": ["Standard", "Custom"],
+        "images":["/products/aluminium.png"]
       },
       {
         "name": "Wall Panel",
@@ -97,7 +98,8 @@
           "Excellent concrete surface finish",
           "Customizable to any layout"
         ],
-        "specifications": ["Standard", "Custom"]
+        "specifications": ["Standard", "Custom"],
+        "images":["/products/aluminium.png"]
       },
       {
         "name": "Column Panel",
@@ -108,7 +110,8 @@
           "Delivers a smooth concrete finish.",
           "Ideal for repetitive use."
         ],
-        "specifications": ["Standard", "Custom"]
+        "specifications": ["Standard", "Custom"],
+        "images":["/products/aluminium.png"]
       },
       {
         "name": "Beam Panel",
@@ -119,7 +122,8 @@
           "Delivers a smooth concrete finish.",
           "Ideal for repetitive use."
         ],
-        "specifications": ["Standard", "Custom"]
+        "specifications": ["Standard", "Custom"],
+        "images":["/products/aluminium.png"]
       }
     ]
   },
@@ -129,7 +133,7 @@
     "title": "MS Pipes & Channels",
     "category": "Steel Fabrication",
     "description": "Heavy-duty pipes and channels ideal for scaffolding, bracing, and fabrication use, ensuring long-lasting performance.",
-    "image": "/Ms_Pipes.jpeg",
+    "image": "/products/round.png",
     "variants": [
       {
         "name": "Round Pipe",
@@ -140,7 +144,9 @@
           "Suitable for structural and industrial use",
           "Available in multiple sizes and thicknesses"
         ],
-        "specifications": ["3M", "6M"]
+        "specifications": ["3M", "6M"],
+        "images":["/products/round.png"]
+
       },
       {
         "name": "C Channel",
@@ -151,7 +157,8 @@
           "Precision-rolled mild steel construction",
           "Ideal for fabrication work"
         ],
-        "specifications": ["3M", "6M"]
+        "specifications": ["3M", "6M"],
+        "images":["/products/c.png"]
       },
       {
         "name": "I Beam",
@@ -162,7 +169,8 @@
           "Durable construction.",
           "Precision-engineered for consistent quality."
         ],
-        "specifications": ["3M", "6M"]
+        "specifications": ["3M", "6M"],
+        "images":["/products/i.png"]
       },
       {
         "name": "Box Pipe",
@@ -173,82 +181,18 @@
           "Sturdy and durable.",
           "Ideal for industrial and structural use."
         ],
-        "specifications": ["3M", "6M"]
+        "specifications": ["3M", "6M"],
+        "images":["/products/box.png"]
       }
     ]
   },
   {
-    "id": "miscellaneous",
-    "slug": "miscellaneous",
-    "title": "Miscellaneous Equipment",
-    "category": "Accessories",
+    "id": "lifts",
+    "slug": "lifts",
+    "title": "Lifts",
+    "category": "Lifting",
     "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
-    "image": "/Jali.jpeg",
-    "variants": [
-      {
-        "name": "Walkway Jali",
-        "description": "Anti-slip galvanized MS walkway jali for safe and stable movement at construction sites.",
-        "features": [
-          "High grip anti-slip design",
-          "Corrosion-resistant galvanized steel",
-          "Strong and lightweight",
-          "Easy to install and remove"
-        ],
-        "specifications": ["Standard", "Custom"]
-      },
-      {
-        "name": "H Frame",
-        "description": "Rigid MS H Frame for plastering, painting, and façade work.",
-        "features": [
-          "Quick setup and dismantling",
-          "High load-bearing capacity",
-          "Stable and secure alignment",
-          "Reusable for multiple site operations"
-        ],
-        "specifications": ["Standard", "Heavy Duty"]
-      },
-      {
-        "name": "Span",
-        "description": "A heavy-duty adjustable span made from mild steel to support formwork and slabs. It features a telescopic design for easy length adjustment.",
-        "features": [
-          "Heavy-duty mild steel construction",
-          "Telescopic design for easy length adjustment",
-          "Provides high load-bearing capacity",
-          "Ideal for supporting formwork and slabs"
-        ],
-        "specifications": ["Standard", "Heavy Duty"]
-      },
-      {
-        "name": "Tie Rod",
-        "description": "A heavy-duty adjustable span made from mild steel to support formwork and slabs. It features a telescopic design for easy length adjustment.",
-        "features": [
-          "Heavy-duty mild steel construction",
-          "Telescopic design for easy length adjustment",
-          "Provides high load-bearing capacity",
-          "Ideal for supporting formwork and slabs"
-        ],
-        "specifications": ["Standard", "Heavy Duty"]
-      },
-      {
-        "name": "Wing Nut",
-        "description": "A durable cast iron or forged steel wing nut designed for reliable locking with tie rods in formwork systems. It ensures secure and efficient shuttering operations.",
-        "features": [
-          "Durable construction (cast iron or forged steel).",
-          "Reliable locking mechanism.",
-          "Easy to tighten and remove.",
-          "Essential for secure and efficient formwork."
-        ],
-        "specifications": ["Standard", "Heavy Duty"]
-      }
-    ]
-  },
-  {
-    "id": "liftsandscreen",
-    "slug": "liftsandscreen",
-    "title": "Lifts and Screen",
-    "category": "Lifting & Safety",
-    "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
-    "image": "/liftsandscreen.jpeg",
+    "image": "/products/lift.png",
     "variants": [
       {
         "name": "Material Lift",
@@ -259,7 +203,8 @@
           "Requires minimal maintenance.",
           "Safely and efficiently hoists materials."
         ],
-        "specifications": ["Standard"]
+        "specifications": ["Standard"],
+        "images":["/products/lift.png"]
       },
       {
         "name": "Passenger Hoist",
@@ -270,7 +215,8 @@
           "Requires minimal maintenance.",
           "Safely and efficiently hoists labor (personnel)."
         ],
-        "specifications": ["Standard"]
+        "specifications": ["Standard"],
+        "images":["/products/lift.png"]
       },
       {
         "name": "Monkey Lift",
@@ -281,7 +227,8 @@
           "Reliable cable system ensures smooth lifting.",
           "Ideal for multi-story projects."
         ],
-        "specifications": ["Standard"]
+        "specifications": ["Standard"],
+        "images":["/products/lift.png"]
       },
       {
         "name": "Ropeway Platform",
@@ -292,8 +239,19 @@
           "Features strong cable support.",
           "Designed for easy assembly."
         ],
-        "specifications": ["Standard"]
-      },
+        "specifications": ["Standard"],
+        "images":["/products/lift.png"]
+      }
+    ]
+  },
+  {
+    "id": "screen",
+    "slug": "screen",
+    "title": "Screens",
+    "category": "Safety",
+    "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
+    "image": "/products/crane.png",
+    "variants": [
       {
         "name": "Mini Crane",
         "description": "Reliable material cranes engineered for heavy lifting on construction sites, ensuring robust quality and enhanced productivity.",
@@ -303,7 +261,8 @@
           "Robust build quality.",
           "Enhances site productivity."
         ],
-        "specifications": ["1ton","500kg","250kg"]
+        "specifications": ["1ton","500kg","250kg"],
+        "images":["/products/crane.png"]
       },
       {
         "name": "Horizontal Net",
@@ -314,7 +273,8 @@
           "Prevents debris and material falls.",
           "Provides essential safety for site personnel and pedestrians."
         ],
-        "specifications": ["5*10,4*4"]
+        "specifications": ["5*10,4*4"],
+        "images":["/products/net.png"]
       },
       {
         "name": "Hydraulic Safety Screen Perimeter",
@@ -325,7 +285,78 @@
           "Offers adjustable height.",
           "Robust build with reliable wind resistance"
         ],
-        "specifications": ["Standard"]
+        "specifications": ["Standard"],
+        "images":["/products/hws.png"]
+      }
+    ]
+  },
+  {
+    "id": "miscellaneous",
+    "slug": "miscellaneous",
+    "title": "Miscellaneous Equipment",
+    "category": "Accessories",
+    "description": "Additional site essentials like H Frames and Walkway Jali ensuring safety and convenience during construction.",
+    "image": "/products/walkway.png",
+    "variants": [
+      {
+        "name": "Walkway Jali",
+        "description": "Anti-slip galvanized MS walkway jali for safe and stable movement at construction sites.",
+        "features": [
+          "High grip anti-slip design",
+          "Corrosion-resistant galvanized steel",
+          "Strong and lightweight",
+          "Easy to install and remove"
+        ],
+        "specifications": ["Standard", "Custom"],
+        "images":["/products/walkway.png"]
+      },
+      {
+        "name": "H Frame",
+        "description": "Rigid MS H Frame for plastering, painting, and façade work.",
+        "features": [
+          "Quick setup and dismantling",
+          "High load-bearing capacity",
+          "Stable and secure alignment",
+          "Reusable for multiple site operations"
+        ],
+        "specifications": ["Standard", "Heavy Duty"],
+        "images":["/products/hframe.png"]
+      },
+      {
+        "name": "Span",
+        "description": "A heavy-duty adjustable span made from mild steel to support formwork and slabs. It features a telescopic design for easy length adjustment.",
+        "features": [
+          "Heavy-duty mild steel construction",
+          "Telescopic design for easy length adjustment",
+          "Provides high load-bearing capacity",
+          "Ideal for supporting formwork and slabs"
+        ],
+        "specifications": ["Standard", "Heavy Duty"],
+        "images":["/products/span.png"]
+      },
+      {
+        "name": "Tie Rod",
+        "description": "A heavy-duty adjustable span made from mild steel to support formwork and slabs. It features a telescopic design for easy length adjustment.",
+        "features": [
+          "Heavy-duty mild steel construction",
+          "Telescopic design for easy length adjustment",
+          "Provides high load-bearing capacity",
+          "Ideal for supporting formwork and slabs"
+        ],
+        "specifications": ["Standard", "Heavy Duty"],
+        "images":["/products/tierod.png"]
+      },
+      {
+        "name": "Wing Nut",
+        "description": "A durable cast iron or forged steel wing nut designed for reliable locking with tie rods in formwork systems. It ensures secure and efficient shuttering operations.",
+        "features": [
+          "Durable construction (cast iron or forged steel).",
+          "Reliable locking mechanism.",
+          "Easy to tighten and remove.",
+          "Essential for secure and efficient formwork."
+        ],
+        "specifications": ["Standard", "Heavy Duty"],
+        "images":["/products/wingnut.png"]
       }
     ]
   }

@@ -38,7 +38,7 @@ function Hero() {
           <Link
             aria-label="Schedule a 30-minute meeting "
             href="https://calendly.com/moviraindustries/30min"
-            className="mt-4 px-4 py-2 text-md sm:px-10 sm:py-3 border-2 tracking-wider font-semibold border-[#EAEAEA] backdrop-blur-2xl hover:bg-[#1C1C1C] hover:border-[#1C1C1C] transition duration-300 "
+            className="mt-4 px-4 py-2 text-md sm:px-10 sm:py-3 border-2 rounded-sm tracking-wider font-semibold border-[#EAEAEA] backdrop-blur-2xl hover:bg-[#1C1C1C] hover:border-[#1C1C1C] transition duration-300 "
           >
             Schedule a Meeting
           </Link>
@@ -58,7 +58,7 @@ function Hero() {
         <div className="w-full md:w-[60%] py-10 md:py-20 rounded-xl">
           <div className="w-full">
             <header className="mb-4 leading-snug font-Play text-center sm:text-left">
-              <h2 className="text-2xl sm:text-4xl font-semibold uppercase pb-2 tracking-wide">
+              <h2 className="text-[26px] md:text-4xl font-semibold pb-2 tracking-wide">
                Best Scaffolding <br /> And Formwork <br />
               </h2>
               <h3 className="italic text-xl tracking-wide">
@@ -79,7 +79,7 @@ function Hero() {
             <Link
               href="/about"
               aria-label="Learn more about Movira Industries"
-              className="group text-md py-2 w-max flex items-center px-6 mx-auto sm:mx-0 uppercase font-Int text-[#EAEAEA] bg-[#1C1C1C] cursor-pointer"
+              className="group rounded-sm text-md py-2 w-max flex items-center px-6 mx-auto sm:mx-0 uppercase font-Int text-[#EAEAEA] bg-[#1C1C1C] cursor-pointer"
             >
               <span>More About Us</span>
               <FaArrowRight className="w-6 ml-4 text-[#EAEAEA] transform transition-transform duration-300 group-hover:translate-x-2" />
