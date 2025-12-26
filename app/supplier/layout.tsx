@@ -1,9 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 export default async function SupplierLayout({
   children,
 }: {
@@ -13,7 +10,10 @@ export default async function SupplierLayout({
   if (!userId) redirect("/sign-in");
 
   const user = await currentUser();
-  if (user?.publicMetadata?.role !== "supplier") redirect("/");
+
+  if (user?.publicMetadata?.role !== "supplier") {
+    redirect("/");
+  }
 
   return <>{children}</>;
 }
