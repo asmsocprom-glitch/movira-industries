@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { SignInCTA } from "./SignInButton";
 
 interface NavLink {
   label: string;
@@ -89,6 +90,7 @@ export default function Navbar() {
             <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
           </button>
         </ul>
+          <SignInCTA />
 
         {/* Hamburger Icon */}
         <button

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.36.3",
     "@splidejs/react-splide": "^0.7.12",
     "@splidejs/splide": "^4.1.4",
     "class-variance-authority": "^0.7.1",
@@ -16,7 +17,7 @@
     "googleapis": "^152.0.0",
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",
-    "next": "15.3.4",
+    "next": "^15.5.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

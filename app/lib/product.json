@@ -87,7 +87,7 @@
           "Smooth concrete finish every time"
         ],
         "specifications": ["Standard", "Custom"],
-        "images":["/products/aluminium.png"]
+        "images":["/products/aluminum.png"]
       },
       {
         "name": "Wall Panel",
@@ -99,7 +99,7 @@
           "Customizable to any layout"
         ],
         "specifications": ["Standard", "Custom"],
-        "images":["/products/aluminium.png"]
+        "images":["/products/aluminum.png"]
       },
       {
         "name": "Column Panel",
@@ -111,7 +111,7 @@
           "Ideal for repetitive use."
         ],
         "specifications": ["Standard", "Custom"],
-        "images":["/products/aluminium.png"]
+        "images":["/products/aluminum.png"]
       },
       {
         "name": "Beam Panel",
@@ -123,7 +123,7 @@
           "Ideal for repetitive use."
         ],
         "specifications": ["Standard", "Custom"],
-        "images":["/products/aluminium.png"]
+        "images":["/products/aluminum.png"]
       }
     ]
   },
