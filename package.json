@@ -14,7 +14,10 @@
     "@splidejs/splide": "^4.1.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+<<<<<<< HEAD
     "firebase": "^12.7.0",
+=======
+>>>>>>> 66c3154126a02acfea12f1bb52be41e4cb9ec2b8
     "googleapis": "^152.0.0",
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",

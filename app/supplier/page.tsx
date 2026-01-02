@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import { useEffect, useState } from "react";
@@ -175,3 +176,22 @@ const Supplier = () => {
 };
 
 export default Supplier;
+=======
+import { SignOutButton } from "@clerk/nextjs";
+
+const Supplier = () => {
+    return ( 
+        <>This is supplier
+        
+        <SignOutButton>
+            <button className="px-6 py-3 rounded-xl bg-black text-white">
+            Sign out
+            </button>
+        </SignOutButton>
+    
+        </> 
+    );
+}
+ 
+export default Supplier;
+>>>>>>> 66c3154126a02acfea12f1bb52be41e4cb9ec2b8

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import { useEffect, useState } from "react";
@@ -147,3 +148,21 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
+=======
+import { SignOutButton } from "@clerk/nextjs";
+
+const Admin = () => {
+  return (
+    <>
+      <p>This is admin</p>
+      <SignOutButton>
+        <button className="px-6 py-3 rounded-xl bg-black text-white">
+          Sign out
+        </button>
+      </SignOutButton>
+    </>
+  );
+};
+
+export default Admin;
+>>>>>>> 66c3154126a02acfea12f1bb52be41e4cb9ec2b8

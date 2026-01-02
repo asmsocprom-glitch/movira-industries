@@ -83,7 +83,7 @@ export default function Navbar() {
             <li key={label} className="relative group">
               <Link href={href} className="px-1">
                 {label}
-                <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
+                <span className="absolute left-0 -bottom-1 w-0 bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
               </Link>
             </li>
           ))}
