@@ -35,7 +35,7 @@ interface Request {
   };
   supplierId: string;
   products: Product[];
-  createdAt?: any;
+  createdAt?: string;
 }
 
 const AdminRequestsPage = () => {
