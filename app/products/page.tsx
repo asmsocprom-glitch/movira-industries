@@ -27,11 +27,6 @@ export default function ProductsPage() {
       <TopSection title="Collection" />
 
       <main className="bg-[#F8F8F8] min-h-screen py-16 px-4 md:px-12 lg:px-20 font-Int text-[#1C1C1C]">
-<<<<<<< HEAD
-
-=======
-        {/* Category Filter */}
->>>>>>> 66c3154126a02acfea12f1bb52be41e4cb9ec2b8
         <div className="flex flex-wrap justify-center gap-3 md:gap-6 mb-12">
           {categories.map((cat) => (
             <button
@@ -48,11 +43,6 @@ export default function ProductsPage() {
           ))}
         </div>
 
-<<<<<<< HEAD
-
-=======
-        {/* Product Grid */}
->>>>>>> 66c3154126a02acfea12f1bb52be41e4cb9ec2b8
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {filteredProducts.map((product) => (
             <div
