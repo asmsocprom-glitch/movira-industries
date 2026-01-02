@@ -35,7 +35,7 @@ const Supplier = () => {
   const [requests, setRequests] = useState<SupplierRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState<Record<string, string>>({});
-
+  //supplier page checking
   useEffect(() => {
     const fetchSupplierRequests = async () => {
       try {
