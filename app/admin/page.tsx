@@ -31,7 +31,7 @@ interface SupplierRequest {
   };
   products: Product[];
   status: string;
-  approvedAt?: any;
+  approvedAt?: string;
 }
 
 function AdminDashboard() {

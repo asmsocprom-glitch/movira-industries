@@ -97,7 +97,7 @@ function Page() {
       <h1 className="text-2xl font-semibold mb-6">Add to Cart</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {cartItems.map((item, idx) => (
+        {cartItems.map((item) => (
           <div
             key={item.productId}
             className="flex gap-4 bg-white border rounded-lg p-4"
