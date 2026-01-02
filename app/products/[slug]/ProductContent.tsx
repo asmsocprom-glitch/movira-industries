@@ -212,7 +212,6 @@ export default function ProductContent({ product }: { product: Product }) {
                 <input
                 type="number"
                 min={1}
-                max={100}
                 
                 onChange={(e) => {
                   const value = Number(e.target.value);
