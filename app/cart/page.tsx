@@ -50,6 +50,7 @@ function Page() {
     if (cartItems.length === 0) return;
 
     setLoading(true);
+    console.log("data is here")
 
     try {
       await addDoc(collection(db, "requests"), {
