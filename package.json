@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.36.3",
     "@splidejs/react-splide": "^0.7.12",
     "@splidejs/splide": "^4.1.4",
+    "emailjs-com": "^3.2.0",
     "firebase": "^12.7.0",
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",

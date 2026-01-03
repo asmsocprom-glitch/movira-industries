@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { SignInCTA } from "./SignInButton";
+// import { SignInCTA } from "./SignInButton";
 
 interface NavLink {
   label: string;
@@ -12,15 +12,13 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Shop All", href: "/products" },
-  { label: "Cart", href: "/cart" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
-
+  const isCartPage = pathname === "/cart";
   // 🔹 ALL hooks must be called first
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -57,8 +55,11 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 w-full py-4 z-30 uppercase font-Play text-white transition-colors duration-500 ${
-        scrolled ? "bg-[#1C1C1C] shadow-lg" : "bg-transparent"
-      }`}
+  scrolled || isCartPage
+    ? "bg-[#1C1C1C] shadow-lg"
+    : "bg-transparent"
+}`}
+
     >
       <div className="flex items-center justify-between mx-5 md:mx-10 lg:mx-20 py-2">
         {/* Logo */}
@@ -78,7 +79,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <ul className="hidden sm:flex space-x-10 lg:space-x-18 tracking-wider text-sm lg:text-lg">
+        <ul className="hidden sm:flex space-x-10 lg:space-x-18 tracking-wider text-sm lg:text-md">
           {navLinks.map(({ label, href }) => (
             <li key={label} className="relative group">
               <Link href={href} className="px-1">
@@ -90,9 +91,14 @@ export default function Navbar() {
           <button onClick={scrollToFooter} className="uppercase">
             Contact Us
           </button>
+          <Link href="/cart">
+            <svg className="w-6 h-6 text-white-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fillRule="evenodd" d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z" clipRule="evenodd"/>
+            </svg>
+          </Link>
+          {/* <SignInCTA /> */}
         </ul>
 
-        <SignInCTA />
 
         {/* Hamburger Icon */}
         <button
@@ -136,6 +142,11 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          <Link href="/cart">
+            <svg className="w-8 h-8 text-white-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fillRule="evenodd" d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z" clipRule="evenodd"/>
+            </svg>
+          </Link>
         </ul>
       </div>
     </nav>
