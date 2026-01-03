@@ -87,14 +87,17 @@ function Page() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-lg">
-        Your cart is empty
-      </div>
+      <>
+        <div className="min-h-screen flex items-center justify-center text-lg">
+          Your cart is empty
+        </div>
+      </>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] px-4 md:px-10 lg:px-20 py-10 font-Int">
+    
       <h1 className="text-2xl font-semibold mb-6">Add to Cart</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

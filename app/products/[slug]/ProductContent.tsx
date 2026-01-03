@@ -72,161 +72,164 @@ export default function ProductContent({ product }: { product: Product }) {
     <div>
       <TopSection title={product.title} />
 
-      <main className="bg-[#F8F8F8] min-h-screen py-10 px-4 md:px-10 lg:px-20 text-[#1C1C1C] font-Int">
-        <div className="flex flex-col lg:flex-row items-start gap-8">
+<main className="bg-[#F8F8F8] min-h-screen py-10 px-4 md:px-10 lg:px-20 text-[#1C1C1C] font-Int">
+  <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-
-          <div className="flex flex-col gap-4 w-full lg:w-1/2">
-            {selectedVariant.images && selectedVariant.images.length > 1 ? (
-              <Splide
-                options={{
-                  type: "loop",
-                  perPage: 1,
-                  autoplay: true,
-                  interval: 3500,
-                  arrows: false,
-                  pagination: true,
-                }}
-                className="rounded-xl overflow-hidden"
-              >
-                {selectedVariant.images.map((imgSrc, idx) => (
-                  <SplideSlide key={imgSrc + idx}>
-                    <div className="relative w-full h-[340px] rounded-xl overflow-hidden border border-[#1C1C1C]/30 shadow-sm">
-                      <Image src={imgSrc} alt={selectedVariant.name} fill className="object-cover" />
-                    </div>
-                  </SplideSlide>
-                ))}
-              </Splide>
-            ) : (
-              <div className="relative w-full h-[340px] rounded-xl overflow-hidden border border-[#1C1C1C]/30 shadow-sm">
-                <Image
-                  src={
-                    selectedVariant.images?.length === 1
-                      ? selectedVariant.images[0]
-                      : product.image
-                  }
-                  alt={selectedVariant.name}
-                  fill
-                  className="object-cover"
-                />
+    {/* LEFT: Product Images */}
+    <div className="sticky top-28 self-start">
+      {selectedVariant.images && selectedVariant.images.length > 1 ? (
+        <Splide
+          options={{
+            type: "loop",
+            perPage: 1,
+            autoplay: true,
+            interval: 3500,
+            arrows: false,
+            pagination: true,
+          }}
+          className="rounded-xl overflow-hidden bg-white p-3"
+        >
+          {selectedVariant.images.map((imgSrc, idx) => (
+            <SplideSlide key={imgSrc + idx}>
+              <div className="relative w-full h-[420px]">
+                <Image src={imgSrc} alt={selectedVariant.name} fill className="object-contain" />
               </div>
-            )}
-          </div>
+            </SplideSlide>
+          ))}
+        </Splide>
+      ) : (
+        <div className="relative w-full h-[420px] rounded-xl bg-white p-4">
+          <Image
+            src={
+              selectedVariant.images?.length === 1
+                ? selectedVariant.images[0]
+                : product.image
+            }
+            alt={selectedVariant.name}
+            fill
+            className="object-contain"
+          />
+        </div>
+      )}
+    </div>
 
+    {/* RIGHT: Product Info */}
+    <div className="bg-white rounded-xl p-6 shadow-sm">
 
-          <div className="flex-1">
-            <h1 className="font-Play uppercase text-2xl md:text-3xl font-semibold mb-1">
-              {product.title}
-            </h1>
+      {/* Title */}
+      <h1 className="font-Play uppercase text-2xl md:text-3xl font-semibold">
+        {product.title}
+      </h1>
+      <p className="text-sm text-[#666] mt-1">{product.category}</p>
 
-            <p className="italic text-[#555] text-sm mb-2">{product.category}</p>
+      {/* Description */}
+      <p className="text-sm text-[#333] mt-4 leading-relaxed">
+        {product.description}
+      </p>
 
-            <p className="text-sm md:text-base text-[#333] leading-relaxed mb-3">
-              {product.description}
-            </p>
+      {/* Variants */}
+      <div className="mt-6">
+        <h4 className="font-semibold text-sm mb-2">Select Variant</h4>
+        <div className="flex flex-wrap gap-2">
+          {product.variants.map((v, idx) => (
+            <button
+              key={v.name + idx}
+              onClick={() => {
+                setSelectedVariantIndex(idx);
+                setSelectedSpecIndex(null);
+              }}
+              className={`px-4 py-2 rounded-full text-xs border transition ${
+                idx === selectedVariantIndex
+                  ? "bg-[#1C1C1C] text-white"
+                  : "bg-white border-gray-300 hover:border-black"
+              }`}
+            >
+              {v.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            <div className="flex flex-wrap gap-3 mt-4 mb-8">
-              <Link
-                href="https://api.whatsapp.com/send?phone=918291527207"
-                className="flex items-center px-4 py-2 text-sm font-semibold text-black bg-yellow-400 border border-gray-800 hover:bg-[#1C1C1C] hover:text-white transition"
-              >
-                Enquire Now
-              </Link>
-
+      {/* Specifications */}
+      {selectedVariant.specifications?.length > 0 && (
+        <div className="mt-6">
+          <h4 className="font-semibold text-sm mb-2">Specifications</h4>
+          <div className="flex flex-wrap gap-2">
+            {selectedVariant.specifications.map((spec, idx) => (
               <button
-                onClick={handleAddToCart}
-                className="flex items-center px-4 py-2 text-sm font-semibold border border-gray-800 hover:bg-[#1C1C1C] hover:text-white transition"
+                key={spec + idx}
+                onClick={() => setSelectedSpecIndex(idx)}
+                className={`px-4 py-2 text-xs rounded-md border transition ${
+                  idx === selectedSpecIndex
+                    ? "bg-[#1C1C1C] text-white"
+                    : "border-gray-300 hover:bg-[#1C1C1C] hover:text-white"
+                }`}
               >
-                Add to Cart
+                {spec}
               </button>
-
-              <Link
-                href="/products"
-                className="flex items-center px-4 py-2 text-sm font-semibold border border-gray-800 hover:bg-[#1C1C1C] hover:text-white transition"
-              >
-                Back to Products
-              </Link>
-            </div>
-
-            <div className="mb-5">
-              <h4 className="font-semibold text-base mb-1">Variants</h4>
-              <div className="flex flex-wrap gap-2">
-                {product.variants.map((v, idx) => (
-                  <button
-                    key={v.name + idx}
-                    onClick={() => {
-                      setSelectedVariantIndex(idx);
-                      setSelectedSpecIndex(null);
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-xs border ${
-                      idx === selectedVariantIndex
-                        ? "bg-[#1C1C1C] text-white border-[#1C1C1C]"
-                        : "bg-white text-[#1C1C1C] border-gray-300"
-                    }`}
-                  >
-                    {v.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-5 mx-1">
-              <p className="text-sm text-[#333] mb-3 leading-relaxed">
-                {selectedVariant.description}
-              </p>
-
-              <ul className="space-y-1.5 mb-4">
-                {selectedVariant.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm">
-                    <span className="text-[#1C1C1C] font-bold">•</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {selectedVariant.specifications?.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-sm mb-2">Specifications:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedVariant.specifications.map((spec, idx) => (
-                      <button
-                        key={spec + idx}
-                        onClick={() => setSelectedSpecIndex(idx)}
-                        className={`border rounded-lg px-3 py-1 text-xs transition ${
-                          idx === selectedSpecIndex
-                            ? "bg-[#1C1C1C] text-white border-[#1C1C1C]"
-                            : "border-[#1C1C1C]/50 hover:bg-[#1C1C1C] hover:text-white"
-                        }`}
-                      >
-                        {spec}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="mb-5">
-              <h4 className="font-semibold text-base mb-1">Quantity</h4>
-              <div className="flex">
-                <input
-                type="number"
-                min={1}
-                
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  if (value >= 1 && value <= 100) {
-                    setQuantity(value);
-                  }
-                }}
-
-                className="w-24 border px-2 py-1 rounded"/>
-              </div>
-            </div>
-
+            ))}
           </div>
         </div>
-      </main>
+      )}
+
+      {/* Quantity */}
+      <div className="mt-6">
+        <h4 className="font-semibold text-sm mb-2">Quantity</h4>
+        <input
+          type="number"
+          placeholder="Quantity"
+          min={1}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+            if (value >= 1 && value <= 100) {
+              setQuantity(value);
+            }
+          }}
+          className="w-28 border border-gray-900 rounded-md px-3 py-2"
+        />
+      </div>
+
+      {/* CTA Buttons */}
+      <div className="mt-8 flex flex-wrap gap-3">
+        <button
+          onClick={handleAddToCart}
+          className="px-6 py-3 text-sm font-semibold bg-[#1C1C1C] text-white hover:opacity-90 transition"
+        >
+          Add to Cart
+        </button>
+
+        <Link
+          href="https://api.whatsapp.com/send?phone=918291527207"
+          className="px-6 py-3 text-sm font-semibold border border-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-white transition"
+        >
+          Enquire Now
+        </Link>
+
+        <Link
+          href="/products"
+          className="px-6 py-3 text-sm font-semibold border border-gray-300 hover:border-black transition"
+        >
+          Back to Products
+        </Link>
+      </div>
+
+      {/* Features */}
+      <div className="mt-8 border-t pt-6">
+        <h4 className="font-semibold text-sm mb-3">Key Features</h4>
+        <ul className="space-y-2">
+          {selectedVariant.features.map((feature, idx) => (
+            <li key={idx} className="text-sm flex gap-2">
+              <span className="font-bold">•</span>
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</main>
+
     </div>
   );
 }
