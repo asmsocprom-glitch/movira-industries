@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { SignOutButton } from "@clerk/nextjs";
-import {
-  collection,
-  getDocs,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { collection, getDocs, doc, writeBatch, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
 
@@ -22,168 +17,192 @@ interface Product {
   quantity: string;
 }
 
-interface SupplierRequest {
+interface Quotation {
   id: string;
-  client: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-  price?: string;
-  products: Product[];
+  supplierEmail: string;
+  supplierRequestId: string;
+  price: number;
   status: string;
-  approvedAt?: string;
 }
 
-function AdminDashboard() {
+interface FinalOrder {
+  supplierEmail: string;
+  supplierPrice: number;
+  margin: number;
+  finalPrice: number;
+}
+
+interface SupplierRequest {
+  id: string;
+  product: Product;
+  status: string;
+  finalOrder?: FinalOrder;
+}
+
+export default function AdminDashboard() {
   const router = useRouter();
-  const [supplierRequests, setSupplierRequests] =
-    useState<SupplierRequest[]>([]);
+  const [requests, setRequests] = useState<SupplierRequest[]>([]);
+  const [quotationsMap, setQuotationsMap] = useState<Record<string, Quotation[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSupplierRequests = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+
       try {
-        const q = query(
-          collection(db, "supplierRequests"),
-          orderBy("approvedAt", "desc")
-        );
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as SupplierRequest[];
-        setSupplierRequests(data);
-      } catch (error) {
-        console.error("Error fetching supplier requests:", error);
+        // Supplier requests
+        const reqSnap = await getDocs(collection(db, "supplierRequests"));
+        const allRequests = reqSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+
+        // Quotations
+        const quoteSnap = await getDocs(collection(db, "quotations"));
+        const map: Record<string, Quotation[]> = {};
+        quoteSnap.docs.forEach(doc => {
+          const q = { id: doc.id, ...(doc.data() as any) };
+          if (!map[q.supplierRequestId]) map[q.supplierRequestId] = [];
+          map[q.supplierRequestId].push(q);
+        });
+        setQuotationsMap(map);
+
+        // Final Orders
+        const finalSnap = await getDocs(collection(db, "finalOrders"));
+        const finalMap: Record<string, FinalOrder> = {};
+        finalSnap.docs.forEach(doc => {
+          const data = doc.data() as any;
+          finalMap[data.supplierRequestId] = {
+            supplierEmail: data.supplierEmail,
+            supplierPrice: data.supplierPrice,
+            margin: data.margin,
+            finalPrice: data.finalPrice,
+          };
+        });
+
+        // Merge final orders into requests
+        const merged = allRequests.map(r => ({
+          ...r,
+          finalOrder: finalMap[r.id],
+          status: finalMap[r.id] ? "finalized" : r.status,
+        }));
+
+        setRequests(merged);
+      } catch (err) {
+        console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSupplierRequests();
+    fetchData();
   }, []);
 
+  const acceptQuotation = async (req: SupplierRequest, q: Quotation) => {
+    const marginInput = prompt(`Enter margin for ${q.supplierEmail}:`);
+    if (!marginInput) return;
+    const margin = Number(marginInput);
+    if (isNaN(margin)) { alert("Invalid margin"); return; }
+    if (!confirm(`Accept ${q.supplierEmail} with margin ${margin}?`)) return;
+
+    try {
+      const batch = writeBatch(db);
+      const finalPrice = q.price + margin;
+
+      // Save final order
+      const finalRef = doc(collection(db, "finalOrders"));
+      batch.set(finalRef, {
+        supplierRequestId: req.id,
+        supplierEmail: q.supplierEmail,
+        supplierPrice: q.price,
+        margin,
+        finalPrice,
+        product: req.product,
+        createdAt: serverTimestamp(),
+      });
+
+      // Update quotations
+      batch.update(doc(db, "quotations", q.id), { status: "accepted", margin, finalPrice });
+      quotationsMap[req.id]?.forEach(other => {
+        if (other.id !== q.id) batch.update(doc(db, "quotations", other.id), { status: "lost" });
+      });
+
+      // Update request
+      batch.update(doc(db, "supplierRequests", req.id), { status: "finalized" });
+
+      await batch.commit();
+      alert("Accepted successfully!");
+
+      // Update UI immediately
+      setRequests(prev => prev.map(r => 
+        r.id === req.id ? { ...r, status: "finalized", finalOrder: { supplierEmail: q.supplierEmail, supplierPrice: q.price, margin, finalPrice } } : r
+      ));
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    }
+  };
+
+  if (loading) return <p className="p-6">Loading...</p>;
+
   return (
-    <div className="min-h-screen bg-[#F8F8F8] p-8 font-Int">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-8 bg-gray-100 min-h-screen">
+      <div className="flex justify-between mb-6 items-center">
         <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-
-        <div className="flex items-center gap-4">
-          <button
+        <div className="flex gap-4">
+          <button 
             onClick={() => router.push("/admin/requests")}
-            className="px-5 py-2 rounded-lg bg-black text-white text-sm"
+            className="bg-black text-white px-4 py-2 rounded"
           >
-            Requests
+            Go to Client Requests
           </button>
-
           <SignOutButton>
-            <button className="px-5 py-2 rounded-lg bg-red-600 text-white text-sm">
-              Sign out
-            </button>
+            <button className="bg-red-600 text-white px-4 py-2 rounded">Sign Out</button>
           </SignOutButton>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto mt-6">
-        <h2 className="text-xl font-semibold mb-4">Supplier Requests</h2>
+      {requests.map(req => (
+        <div key={req.id} className="bg-white p-6 rounded shadow mb-6">
+          <h2 className="font-semibold text-lg">{req.product.title}</h2>
+          <p className="text-sm text-gray-600">{req.product.variant} | {req.product.specification}</p>
 
-        {loading ? (
-          <p>Loading supplier requests...</p>
-        ) : supplierRequests.length === 0 ? (
-          <p className="text-gray-500">No supplier requests found</p>
-        ) : (
-          <div className="space-y-6">
-            {supplierRequests.map((req) => {
-              const hasPrice = !!req.price;
-              return (
-                <div
-                  key={req.id}
-                  className="bg-white border rounded-xl p-6 shadow-sm"
-                >
-                  <div className="mb-4">
-                    <h3 className="font-semibold">
-                      {req.client.name}
-                    </h3>
-
-                    <p className="text-sm text-gray-600">
-                      {req.client.email} | {req.client.phone}
-                    </p>
-
-                    <div className="mt-2">
-                      <span
-                        className={`inline-block px-3 py-1 text-xs rounded-full font-medium ${
-                          hasPrice
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {hasPrice
-                          ? "Supplier Quoted"
-                          : "Awaiting Supplier Price"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {req.products.map((product) => (
-                      <div
-                        key={product.productId}
-                        className="flex gap-4 border rounded-lg p-3"
-                      >
-                        <div className="relative w-20 h-20 border rounded overflow-hidden">
-                          <Image
-                            src={product.image}
-                            alt={product.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-
-                        <div className="flex-1">
-                          <h4 className="font-medium">
-                            {product.title}
-                          </h4>
-
-                          <p className="text-sm text-gray-600">
-                            {product.category}
-                          </p>
-
-                          <p className="text-sm">
-                            <b>Variant:</b> {product.variant}
-                          </p>
-
-                          <p className="text-sm">
-                            <b>Spec:</b>{" "}
-                            {product.specification}
-                          </p>
-
-                          <p className="text-sm">
-                            <b>Quantity:</b>{" "}
-                            {product.quantity}
-                          </p>
-
-                          {req.price ? (
-                            <p className="text-sm text-green-600 font-semibold mt-1">
-                              Price: ₹{req.price}
-                            </p>
-                          ) : (
-                            <p className="text-sm text-orange-500 font-medium mt-1">
-                              Awaiting supplier price
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="flex gap-4 mt-3 mb-3">
+            <div className="relative w-20 h-20">
+              <Image src={req.product.image} alt={req.product.title} fill className="object-cover rounded" />
+            </div>
+            <div>
+              <p><b>Quantity:</b> {req.product.quantity}</p>
+            </div>
           </div>
-        )}
-      </div>
+
+          {!req.finalOrder && (
+            <>
+              <h4 className="font-semibold mb-2">Supplier Quotes:</h4>
+              {quotationsMap[req.id]?.map(q => (
+                <div key={q.id} className="flex justify-between items-center border p-2 rounded mb-2">
+                  <span>{q.supplierEmail} — ₹{q.price}</span>
+                  {q.status === "under_review" && (
+                    <button onClick={() => acceptQuotation(req, q)} className="bg-green-600 text-white px-3 py-1 rounded">
+                      Accept
+                    </button>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+
+          {req.finalOrder && (
+            <div className="mt-4 p-4 border-l-4 border-green-500 bg-green-50 rounded">
+              <h4 className="font-semibold mb-2 text-green-700">Final Order</h4>
+              <p><b>Supplier:</b> {req.finalOrder.supplierEmail}</p>
+              <p><b>Supplier Price:</b> ₹{req.finalOrder.supplierPrice}</p>
+              <p><b>Margin:</b> ₹{req.finalOrder.margin}</p>
+              <p className="text-lg font-semibold"><b>Final Price:</b> ₹{req.finalOrder.finalPrice}</p>
+              <button className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Send Request to Client
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
-
-export default AdminDashboard;

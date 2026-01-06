@@ -91,14 +91,14 @@ export default function ProductContent({ product }: { product: Product }) {
         >
           {selectedVariant.images.map((imgSrc, idx) => (
             <SplideSlide key={imgSrc + idx}>
-              <div className="relative w-full h-[420px]">
+              <div className="relative w-full ">
                 <Image src={imgSrc} alt={selectedVariant.name} fill className="object-contain" />
               </div>
             </SplideSlide>
           ))}
         </Splide>
       ) : (
-        <div className="relative w-full h-[420px] rounded-xl bg-white p-4">
+        <div className="relative w-full rounded-xl bg-white p-4">
           <Image
             src={
               selectedVariant.images?.length === 1
@@ -181,7 +181,7 @@ export default function ProductContent({ product }: { product: Product }) {
           min={1}
           onChange={(e) => {
             const value = Number(e.target.value);
-            if (value >= 1 && value <= 100) {
+            if (value >= 1 ) {
               setQuantity(value);
             }
           }}
