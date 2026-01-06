@@ -4,61 +4,51 @@ import { useEffect, useState } from "react";
 import {
   collection,
   getDocs,
-  orderBy,
-  query,
   doc,
-  deleteDoc,
-  addDoc,
+  getDoc,
   updateDoc,
+  addDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface Product {
+interface ProductRequest {
+  id: string;
+  clientId: string;
   productId: string;
   title: string;
   category: string;
   variant: string;
   specification: string;
+  quantity: number;
   image: string;
-  quantity:string
+  status: string;
 }
 
-interface Request {
-  id: string;
-  client: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-  supplierId: string;
-  products: Product[];
-  createdAt?: string;
+interface Client {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
 }
 
 const AdminRequestsPage = () => {
   const router = useRouter();
-
-  const [requests, setRequests] = useState<Request[]>([]);
+  const [requests, setRequests] = useState<ProductRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const q = query(
-          collection(db, "requests"),
-          orderBy("createdAt", "desc")
-        );
+        const snapshot = await getDocs(collection(db, "clientRequests"));
+        const reqData = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as ProductRequest[];
 
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Request[];
-
-        setRequests(data);
+        setRequests(reqData.filter((r) => r.status === "pending"));
       } catch (err) {
         console.error("Error fetching requests:", err);
       } finally {
@@ -69,183 +59,148 @@ const AdminRequestsPage = () => {
     fetchRequests();
   }, []);
 
-  const rejectProduct = async (
-    request: Request,
-    productId: string
-  ) => {
-    const confirm = window.confirm(
-      "Do you want to reject this product?"
-    );
-    if (!confirm) return;
-
-    const remainingProducts = request.products.filter(
-      (p) => p.productId !== productId
-    );
-
-    try {
-      if (remainingProducts.length === 0) {
-        await deleteDoc(doc(db, "requests", request.id));
-        setRequests((prev) =>
-          prev.filter((r) => r.id !== request.id)
-        );
-      } else {
-        await updateDoc(doc(db, "requests", request.id), {
-          products: remainingProducts,
-        });
-
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.id === request.id
-              ? { ...r, products: remainingProducts }
-              : r
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Reject product failed:", error);
-    }
+  const getClient = async (clientId: string) => {
+    const snap = await getDoc(doc(db, "clients", clientId));
+    if (snap.exists()) return snap.data() as Client;
+    return null;
   };
 
-  const acceptProduct = async (
-    request: Request,
-    product: Product
-  ) => {
-    const confirm = window.confirm(
-      "Do you want to accept this product?"
-    );
-    if (!confirm) return;
+  const rejectRequest = async (req: ProductRequest) => {
+    if (!window.confirm("Reject this request?")) return;
 
-    const remainingProducts = request.products.filter(
-      (p) => p.productId !== product.productId
-    );
+    await updateDoc(doc(db, "clientRequests", req.id), {
+      status: "rejected",
+      rejectedAt: serverTimestamp(),
+    });
+    setRequests((prev) => prev.filter((r) => r.id !== req.id));
+  };
 
-    try {
-      await addDoc(collection(db, "supplierRequests"), {
-        client: request.client,
-        products: [product],
-        status: "pending",
-        approvedAt: serverTimestamp(),
-      });
+  const acceptRequest = async (req: ProductRequest) => {
+    if (!window.confirm("Approve & send to suppliers?")) return;
 
-      if (remainingProducts.length === 0) {
-        await deleteDoc(doc(db, "requests", request.id));
-        setRequests((prev) =>
-          prev.filter((r) => r.id !== request.id)
-        );
-      } else {
-        await updateDoc(doc(db, "requests", request.id), {
-          products: remainingProducts,
-        });
+    await updateDoc(doc(db, "clientRequests", req.id), {
+      status: "approved",
+      approvedAt: serverTimestamp(),
+    });
 
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.id === request.id
-              ? { ...r, products: remainingProducts }
-              : r
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Accept product failed:", error);
-    }
+    await addDoc(collection(db, "supplierRequests"), {
+      clientRequestId: req.id,
+      clientId: req.clientId,
+      product: {
+        productId: req.productId,
+        title: req.title,
+        category: req.category,
+        variant: req.variant,
+        specification: req.specification,
+        quantity: req.quantity,
+        image: req.image,
+      },
+      status: "pending",
+      createdAt: serverTimestamp(),
+    });
+
+    setRequests((prev) => prev.filter((r) => r.id !== req.id));
   };
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] p-8 font-Int">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold">
-            Client Requests
-          </h1>
-          <button
-            onClick={() => router.push("/admin")}
-            className="text-sm text-gray-600 underline mt-1"
-          >
-            ← Back to Dashboard
-          </button>
-        </div>
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-2xl font-semibold mb-6">Client Requests</h1>
 
         {loading ? (
-          <p>Loading requests...</p>
+          <p>Loading...</p>
         ) : requests.length === 0 ? (
-          <p className="text-gray-500">No client requests</p>
+          <p className="text-gray-500">No pending requests</p>
         ) : (
           <div className="space-y-6">
             {requests.map((req) => (
-              <div
+              <ClientRequestCard
                 key={req.id}
-                className="bg-white border rounded-xl p-6 shadow-sm"
-              >
-                <div className="mb-4">
-                  <h2 className="font-semibold text-lg">
-                    {req.client.name}
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    📧 {req.client.email} | 📞 {req.client.phone}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {req.products.map((product) => (
-                    <div
-                      key={product.productId}
-                      className="border rounded-lg p-3"
-                    >
-                      <div className="flex gap-4">
-                        <div className="relative w-20 h-20 border rounded overflow-hidden">
-                          <Image
-                            src={product.image}
-                            alt={product.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-
-                        <div className="flex-1">
-                          <h3 className="font-medium">
-                            {product.title}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {product.category}
-                          </p>
-                          <p className="text-sm">
-                            <b>Variant:</b> {product.variant}
-                          </p>
-                          <p className="text-sm">
-                            <b>Spec:</b> {product.specification}
-                          </p>
-                           <p className="text-sm">
-                            <b>Quantity:</b> {product.quantity}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 mt-3">
-                        <button
-                          onClick={() =>
-                            acceptProduct(req, product)
-                          }
-                          className="px-4 py-1 text-sm rounded bg-green-600 text-white"
-                        >
-                          Accept
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            rejectProduct(req, product.productId)
-                          }
-                          className="px-4 py-1 text-sm rounded bg-red-600 text-white"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                req={req}
+                rejectRequest={rejectRequest}
+                acceptRequest={acceptRequest}
+              />
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+const ClientRequestCard = ({
+  req,
+  rejectRequest,
+  acceptRequest,
+}: {
+  req: ProductRequest;
+  rejectRequest: (req: ProductRequest) => void;
+  acceptRequest: (req: ProductRequest) => void;
+}) => {
+  const [client, setClient] = useState<Client | null>(null);
+
+  useEffect(() => {
+    const fetchClient = async () => {
+      const snap = await getDoc(doc(db, "clients", req.clientId));
+      if (snap.exists()) setClient(snap.data() as Client);
+    };
+    fetchClient();
+  }, [req.clientId]);
+
+  return (
+    <div className="bg-white border rounded-xl p-6">
+      <div className="mb-4">
+        <h2 className="font-semibold text-lg">
+          {client?.name || "Unknown Client"}
+        </h2>
+        <p className="text-sm text-gray-600">
+          {client?.email || "N/A"} | {client?.phone || "N/A"}
+        </p>
+        <p className="text-sm text-gray-600">
+          {client?.address || "N/A"}
+        </p>
+      </div>
+
+      <div className="flex gap-4">
+        <div className="relative w-24 h-24 border rounded overflow-hidden">
+          <Image
+            src={req.image}
+            alt={req.title}
+            fill
+            className="object-cover"
+          />
+        </div>
+
+        <div>
+          <h3 className="font-medium">{req.title}</h3>
+          <p className="text-sm">
+            <b>Category:</b> {req.category}
+          </p>
+          <p className="text-sm">
+            <b>Variant:</b> {req.variant}
+          </p>
+          <p className="text-sm">
+            <b>Spec:</b> {req.specification}
+          </p>
+          <p className="text-sm">
+            <b>Qty:</b> {req.quantity}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-3 mt-4">
+        <button
+          onClick={() => acceptRequest(req)}
+          className="px-4 py-2 bg-green-600 text-white rounded"
+        >
+          Approve
+        </button>
+        <button
+          onClick={() => rejectRequest(req)}
+          className="px-4 py-2 bg-red-600 text-white rounded"
+        >
+          Reject
+        </button>
       </div>
     </div>
   );

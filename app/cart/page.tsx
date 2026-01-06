@@ -2,9 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  Timestamp,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
-
 
 interface CartItem {
   productId: string;
@@ -13,8 +19,7 @@ interface CartItem {
   variant: string;
   specification: string;
   image: string;
-  status?: string;
-  quantity:string
+  quantity: string;
 }
 
 function Page() {
@@ -30,41 +35,67 @@ function Page() {
   useEffect(() => {
     const storedItems = localStorage.getItem("cartItems");
     if (storedItems) {
-      const items: CartItem[] = JSON.parse(storedItems).map((item: CartItem) => ({
-        ...item,
-        status: "No Action",
-      }));
-      setCartItems(items);
+      setCartItems(JSON.parse(storedItems));
     }
   }, []);
 
   const handleDelete = (productId: string) => {
-    const updatedCart = cartItems.filter((item) => item.productId !== productId);
+    const updatedCart = cartItems.filter(
+      (item) => item.productId !== productId
+    );
     setCartItems(updatedCart);
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
   };
-
 
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cartItems.length === 0) return;
 
     setLoading(true);
-    console.log("data is here")
 
     try {
-      await addDoc(collection(db, "requests"), {
-        client: {
+      // find or create client
+      const clientQuery = query(
+        collection(db, "clients"),
+        where("email", "==", email)
+      );
+      const clientSnap = await getDocs(clientQuery);
+
+      let clientId = "";
+
+      if (!clientSnap.empty) {
+        clientId = clientSnap.docs[0].id;
+      } else {
+        const clientRef = await addDoc(collection(db, "clients"), {
           name,
           email,
           phone,
-          address
-        },
-        products: cartItems,
-        createdAt: Timestamp.now(),
+          address,
+          createdAt: Timestamp.now(),
+        });
+        clientId = clientRef.id;
+      }
 
-      });
-      console.log("data passed")
+      // create request per product 
+      const requestsRef = collection(db, "clientRequests");
+
+      for (const item of cartItems) {
+        await addDoc(requestsRef, {
+          clientId,
+
+          productId: item.productId,
+          title: item.title,
+          category: item.category,
+          variant: item.variant,
+          specification: item.specification,
+          image: item.image,
+          quantity: item.quantity,
+
+          status: "pending",
+          createdAt: Timestamp.now(),
+        });
+      }
+
       alert(
         "Request successful! You will be notified on your email or phone number."
       );
@@ -76,7 +107,6 @@ function Page() {
       setEmail("");
       setPhone("");
       setAddress("");
-      
     } catch (error) {
       console.log(error);
       alert("Something went wrong. Please try again.");
@@ -87,17 +117,14 @@ function Page() {
 
   if (cartItems.length === 0) {
     return (
-      <>
-        <div className="min-h-screen flex items-center justify-center text-lg">
-          Your cart is empty
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center text-lg">
+        Your cart is empty
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] px-4 md:px-10 lg:px-20 py-10 font-Int">
-    
       <h1 className="text-2xl font-semibold mb-6">Add to Cart</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -126,8 +153,7 @@ function Page() {
                 {item.specification}
               </p>
               <p className="text-sm">
-                <span className="font-medium">Quantity:</span>{" "}
-                {item.quantity}
+                <span className="font-medium">Quantity:</span> {item.quantity}
               </p>
 
               <button
@@ -141,14 +167,12 @@ function Page() {
         ))}
       </div>
 
-
       <button
         onClick={() => setShowForm(true)}
         className="mt-8 px-6 py-3 bg-black text-white rounded-lg"
       >
         Send Request
       </button>
-
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
