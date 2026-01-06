@@ -12,7 +12,6 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 interface ProductRequest {
   id: string;
@@ -35,7 +34,6 @@ interface Client {
 }
 
 const AdminRequestsPage = () => {
-  const router = useRouter();
   const [requests, setRequests] = useState<ProductRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,12 +56,6 @@ const AdminRequestsPage = () => {
 
     fetchRequests();
   }, []);
-
-  const getClient = async (clientId: string) => {
-    const snap = await getDoc(doc(db, "clients", clientId));
-    if (snap.exists()) return snap.data() as Client;
-    return null;
-  };
 
   const rejectRequest = async (req: ProductRequest) => {
     if (!window.confirm("Reject this request?")) return;

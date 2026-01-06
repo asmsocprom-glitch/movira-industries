@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, doc, writeBatch, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
 
@@ -23,6 +23,8 @@ interface Quotation {
   supplierRequestId: string;
   price: number;
   status: string;
+  margin?: number;
+  finalPrice?: number;
 }
 
 interface FinalOrder {
@@ -48,27 +50,30 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
       try {
-        // Supplier requests
+        // Fetch Supplier Requests
         const reqSnap = await getDocs(collection(db, "supplierRequests"));
-        const allRequests = reqSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+        const allRequests: SupplierRequest[] = reqSnap.docs.map(d => {
+          const data = d.data() as Omit<SupplierRequest, "id">;
+          return { id: d.id, ...data };
+        });
 
-        // Quotations
+        // Fetch Quotations
         const quoteSnap = await getDocs(collection(db, "quotations"));
         const map: Record<string, Quotation[]> = {};
-        quoteSnap.docs.forEach(doc => {
-          const q = { id: doc.id, ...(doc.data() as any) };
+        quoteSnap.docs.forEach(d => {
+          const data = d.data() as Omit<Quotation, "id">;
+          const q: Quotation = { id: d.id, ...data };
           if (!map[q.supplierRequestId]) map[q.supplierRequestId] = [];
           map[q.supplierRequestId].push(q);
         });
         setQuotationsMap(map);
 
-        // Final Orders
+        // Fetch Final Orders
         const finalSnap = await getDocs(collection(db, "finalOrders"));
         const finalMap: Record<string, FinalOrder> = {};
-        finalSnap.docs.forEach(doc => {
-          const data = doc.data() as any;
+        finalSnap.docs.forEach(d => {
+          const data = d.data() as FinalOrder & { supplierRequestId: string };
           finalMap[data.supplierRequestId] = {
             supplierEmail: data.supplierEmail,
             supplierPrice: data.supplierPrice,
@@ -78,7 +83,7 @@ export default function AdminDashboard() {
         });
 
         // Merge final orders into requests
-        const merged = allRequests.map(r => ({
+        const merged: SupplierRequest[] = allRequests.map(r => ({
           ...r,
           finalOrder: finalMap[r.id],
           status: finalMap[r.id] ? "finalized" : r.status,
@@ -103,12 +108,10 @@ export default function AdminDashboard() {
     if (!confirm(`Accept ${q.supplierEmail} with margin ${margin}?`)) return;
 
     try {
-      const batch = writeBatch(db);
       const finalPrice = q.price + margin;
 
       // Save final order
-      const finalRef = doc(collection(db, "finalOrders"));
-      batch.set(finalRef, {
+      await addDoc(collection(db, "finalOrders"), {
         supplierRequestId: req.id,
         supplierEmail: q.supplierEmail,
         supplierPrice: q.price,
@@ -118,19 +121,21 @@ export default function AdminDashboard() {
         createdAt: serverTimestamp(),
       });
 
-      // Update quotations
-      batch.update(doc(db, "quotations", q.id), { status: "accepted", margin, finalPrice });
-      quotationsMap[req.id]?.forEach(other => {
-        if (other.id !== q.id) batch.update(doc(db, "quotations", other.id), { status: "lost" });
-      });
+      // Update selected quotation
+      await updateDoc(doc(db, "quotations", q.id), { status: "accepted", margin, finalPrice });
 
-      // Update request
-      batch.update(doc(db, "supplierRequests", req.id), { status: "finalized" });
+      // Update other quotations as lost
+      const otherQuotations = quotationsMap[req.id] ?? [];
+      for (const other of otherQuotations) {
+        if (other.id !== q.id) {
+          await updateDoc(doc(db, "quotations", other.id), { status: "lost" });
+        }
+      }
 
-      await batch.commit();
-      alert("Accepted successfully!");
+      // Update supplier request status
+      await updateDoc(doc(db, "supplierRequests", req.id), { status: "finalized" });
 
-      // Update UI immediately
+      // Update UI
       setRequests(prev => prev.map(r => 
         r.id === req.id ? { ...r, status: "finalized", finalOrder: { supplierEmail: q.supplierEmail, supplierPrice: q.price, margin, finalPrice } } : r
       ));
