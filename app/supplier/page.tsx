@@ -10,6 +10,7 @@ import {
   where,
   addDoc,
   serverTimestamp,
+  DocumentData,
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
@@ -34,14 +35,14 @@ interface Quotation {
   supplierRequestId: string;
   supplierEmail: string;
   price: number;
-  status: string; // under_review | accepted | lost
+  status: "under_review" | "accepted" | "lost";
   product: Product;
 }
 
 interface SupplierAction {
   supplierRequestId: string;
   supplierEmail: string;
-  action: string; // "rejected"
+  action: "rejected";
 }
 
 export default function SupplierDashboard() {
@@ -51,8 +52,8 @@ export default function SupplierDashboard() {
   const [newRequests, setNewRequests] = useState<SupplierRequest[]>([]);
   const [myQuotations, setMyQuotations] = useState<Quotation[]>([]);
   const [prices, setPrices] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!supplierEmail) return;
@@ -64,27 +65,25 @@ export default function SupplierDashboard() {
         const reqSnap = await getDocs(
           query(collection(db, "supplierRequests"), orderBy("createdAt", "desc"))
         );
-        const allRequests: SupplierRequest[] = reqSnap.docs.map(doc => ({
-          id: doc.id,
-          ...(doc.data() as any),
-        }));
+
+        const allRequests: SupplierRequest[] = reqSnap.docs.map(doc => {
+          const data = doc.data() as { product: Product };
+          return { id: doc.id, product: data.product };
+        });
 
         // Supplier's quotations
         const quoteSnap = await getDocs(
-          query(
-            collection(db, "quotations"),
-            where("supplierEmail", "==", supplierEmail)
-          )
+          query(collection(db, "quotations"), where("supplierEmail", "==", supplierEmail))
         );
         const quotes: Quotation[] = quoteSnap.docs.map(doc => {
-          const data = doc.data() as any;
+          const data = doc.data() as DocumentData;
           return {
             id: doc.id,
             supplierRequestId: data.supplierRequestId,
             supplierEmail: data.supplierEmail,
             price: data.price,
             status: data.status,
-            product: data.product,
+            product: data.product as Product,
           };
         });
 
@@ -142,17 +141,9 @@ export default function SupplierDashboard() {
       setNewRequests(prev => prev.filter(r => r.id !== req.id));
       setMyQuotations(prev => [
         ...prev,
-        {
-          id: Math.random().toString(),
-          supplierRequestId: req.id,
-          supplierEmail,
-          price,
-          status: "under_review",
-          product: req.product,
-        },
+        { id: Math.random().toString(), supplierRequestId: req.id, supplierEmail, price, status: "under_review", product: req.product },
       ]);
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Failed to submit quotation.");
     } finally {
       setProcessing(prev => ({ ...prev, [req.id]: false }));
@@ -185,13 +176,10 @@ export default function SupplierDashboard() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Supplier Dashboard</h1>
           <SignOutButton>
-            <button className="bg-black text-white px-4 py-2 rounded">
-              Sign Out
-            </button>
+            <button className="bg-black text-white px-4 py-2 rounded">Sign Out</button>
           </SignOutButton>
         </div>
 
@@ -231,11 +219,7 @@ export default function SupplierDashboard() {
             <Card key={q.id}>
               <ProductDisplay product={q.product} />
               <p className="text-sm mt-2">
-                {q.status === "under_review"
-                  ? "Waiting for admin decision"
-                  : q.status === "accepted"
-                  ? "Accepted by Admin"
-                  : "Not Selected"}
+                {q.status === "under_review" ? "Waiting for admin decision" : q.status === "accepted" ? "Accepted by Admin" : "Not Selected"}
               </p>
               <p className="text-sm font-semibold mt-1">Price: ₹{q.price}</p>
             </Card>
@@ -246,30 +230,21 @@ export default function SupplierDashboard() {
   );
 }
 
-const Section = ({ title, children }: any) => (
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="mb-10">
     <h2 className="text-xl font-semibold mb-4">{title}</h2>
-    {children.length === 0 ? (
-      <p className="text-gray-500">No items</p>
-    ) : (
-      <div className="space-y-4">{children}</div>
-    )}
+    {Array.isArray(children) && children.length === 0 ? <p className="text-gray-500">No items</p> : <div className="space-y-4">{children}</div>}
   </div>
 );
 
-const Card = ({ children }: any) => (
+const Card = ({ children }: { children: React.ReactNode }) => (
   <div className="bg-white p-5 rounded-lg shadow">{children}</div>
 );
 
 const ProductDisplay = ({ product }: { product: Product }) => (
   <div className="flex gap-4">
     <div className="relative w-20 h-20">
-      <Image
-        src={product.image}
-        alt={product.title}
-        fill
-        className="object-cover rounded"
-      />
+      <Image src={product.image} alt={product.title} fill className="object-cover rounded" />
     </div>
     <div>
       <h3 className="font-medium">{product.title}</h3>
