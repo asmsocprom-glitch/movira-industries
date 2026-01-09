@@ -91,14 +91,14 @@ export default function ProductContent({ product }: { product: Product }) {
         >
           {selectedVariant.images.map((imgSrc, idx) => (
             <SplideSlide key={imgSrc + idx}>
-              <div className="relative w-full ">
+              <div className="relative w-full h-105">
                 <Image src={imgSrc} alt={selectedVariant.name} fill className="object-contain" />
               </div>
             </SplideSlide>
           ))}
         </Splide>
       ) : (
-        <div className="relative w-full rounded-xl bg-white p-4">
+        <div className="relative w-full rounded-xl  h-105 bg-white p-4">
           <Image
             src={
               selectedVariant.images?.length === 1
