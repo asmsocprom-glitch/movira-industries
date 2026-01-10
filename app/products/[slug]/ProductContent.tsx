@@ -76,7 +76,7 @@ export default function ProductContent({ product }: { product: Product }) {
   <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
 
     {/* LEFT: Product Images */}
-    <div className="sticky top-28 self-start">
+    <div className="md:sticky md:top-28 self-start">
       {selectedVariant.images && selectedVariant.images.length > 1 ? (
         <Splide
           options={{
