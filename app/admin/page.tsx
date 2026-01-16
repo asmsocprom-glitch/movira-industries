@@ -1,213 +1,287 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, doc, updateDoc, addDoc, serverTimestamp } from "firebase/firestore";
+import { SignOutButton } from "@clerk/nextjs";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
-import Image from "next/image";
 
 interface Product {
   productId: string;
   title: string;
-  category: string;
-  variant: string;
-  specification: string;
-  image: string;
-  quantity: string;
-}
-
-interface Quotation {
-  id: string;
-  supplierEmail: string;
-  supplierRequestId: string;
-  price: number;
-  status: string;
-  margin?: number;
-  finalPrice?: number;
-}
-
-interface FinalOrder {
-  supplierEmail: string;
-  supplierPrice: number;
-  margin: number;
-  finalPrice: number;
+  variant?: string;
+  specification?: string;
+  quantity: number;
+  price?: number;
 }
 
 interface SupplierRequest {
   id: string;
-  product: Product;
-  status: string;
-  finalOrder?: FinalOrder;
+  clientId: string;
+  products: Product[];
+  status: "pending" | "accepted";
+}
+
+interface Quotation {
+  id: string;
+  supplierRequestId: string;
+  clientId: string;
+  supplierEmail: string;
+  products: Product[];
+  status: "under_review" | "accepted" | "lost";
+}
+
+interface Client {
+  name: string;
+  address?: string;
+  email?: string;
+  phone?: string;
 }
 
 export default function AdminDashboard() {
   const router = useRouter();
+
   const [requests, setRequests] = useState<SupplierRequest[]>([]);
-  const [quotationsMap, setQuotationsMap] = useState<Record<string, Quotation[]>>({});
+  const [clients, setClients] = useState<Record<string, Client>>({});
+  const [quotations, setQuotations] = useState<Record<string, Quotation[]>>({});
+  const [modalRequest, setModalRequest] = useState<SupplierRequest | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [marginMap, setMarginMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const load = async () => {
       setLoading(true);
-      try {
-        // Fetch Supplier Requests
-        const reqSnap = await getDocs(collection(db, "supplierRequests"));
-        const allRequests: SupplierRequest[] = reqSnap.docs.map(d => {
-          const data = d.data() as Omit<SupplierRequest, "id">;
-          return { id: d.id, ...data };
+
+      const clientReqSnap = await getDocs(collection(db, "clientRequests"));
+      setPendingCount(
+        clientReqSnap.docs.filter((d) => d.data().status === "pending").length
+      );
+
+      const srQuery = query(
+        collection(db, "supplierRequests"),
+        where("status", "!=", "accepted")
+      );
+
+      const srSnap = await getDocs(srQuery);
+
+      const srList: SupplierRequest[] = [];
+      const clientCache: Record<string, Client> = {};
+
+      for (const d of srSnap.docs) {
+        const data = d.data();
+
+        srList.push({
+          id: d.id,
+          clientId: data.clientId,
+          products: data.products,
+          status: data.status,
         });
 
-        // Fetch Quotations
-        const quoteSnap = await getDocs(collection(db, "quotations"));
-        const map: Record<string, Quotation[]> = {};
-        quoteSnap.docs.forEach(d => {
-          const data = d.data() as Omit<Quotation, "id">;
-          const q: Quotation = { id: d.id, ...data };
-          if (!map[q.supplierRequestId]) map[q.supplierRequestId] = [];
-          map[q.supplierRequestId].push(q);
-        });
-        setQuotationsMap(map);
-
-        // Fetch Final Orders
-        const finalSnap = await getDocs(collection(db, "finalOrders"));
-        const finalMap: Record<string, FinalOrder> = {};
-        finalSnap.docs.forEach(d => {
-          const data = d.data() as FinalOrder & { supplierRequestId: string };
-          finalMap[data.supplierRequestId] = {
-            supplierEmail: data.supplierEmail,
-            supplierPrice: data.supplierPrice,
-            margin: data.margin,
-            finalPrice: data.finalPrice,
-          };
-        });
-
-        // Merge final orders into requests
-        const merged: SupplierRequest[] = allRequests.map(r => ({
-          ...r,
-          finalOrder: finalMap[r.id],
-          status: finalMap[r.id] ? "finalized" : r.status,
-        }));
-
-        setRequests(merged);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const acceptQuotation = async (req: SupplierRequest, q: Quotation) => {
-    const marginInput = prompt(`Enter margin for ${q.supplierEmail}:`);
-    if (!marginInput) return;
-    const margin = Number(marginInput);
-    if (isNaN(margin)) { alert("Invalid margin"); return; }
-    if (!confirm(`Accept ${q.supplierEmail} with margin ${margin}?`)) return;
-
-    try {
-      const finalPrice = q.price + margin;
-
-      // Save final order
-      await addDoc(collection(db, "finalOrders"), {
-        supplierRequestId: req.id,
-        supplierEmail: q.supplierEmail,
-        supplierPrice: q.price,
-        margin,
-        finalPrice,
-        product: req.product,
-        createdAt: serverTimestamp(),
-      });
-
-      // Update selected quotation
-      await updateDoc(doc(db, "quotations", q.id), { status: "accepted", margin, finalPrice });
-
-      // Update other quotations as lost
-      const otherQuotations = quotationsMap[req.id] ?? [];
-      for (const other of otherQuotations) {
-        if (other.id !== q.id) {
-          await updateDoc(doc(db, "quotations", other.id), { status: "lost" });
+        if (!clientCache[data.clientId]) {
+          const c = await getDoc(doc(db, "clients", data.clientId));
+          if (c.exists()) clientCache[data.clientId] = c.data() as Client;
         }
       }
 
-      // Update supplier request status
-      await updateDoc(doc(db, "supplierRequests", req.id), { status: "finalized" });
+      const qSnap = await getDocs(collection(db, "quotations"));
+      const qMap: Record<string, Quotation[]> = {};
 
-      // Update UI
-      setRequests(prev => prev.map(r => 
-        r.id === req.id ? { ...r, status: "finalized", finalOrder: { supplierEmail: q.supplierEmail, supplierPrice: q.price, margin, finalPrice } } : r
-      ));
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong.");
+      qSnap.docs.forEach((d) => {
+        const q = { id: d.id, ...(d.data() as Omit<Quotation, "id">) };
+        if (q.status !== "under_review") return;
+        if (!qMap[q.supplierRequestId]) qMap[q.supplierRequestId] = [];
+        qMap[q.supplierRequestId].push(q);
+      });
+
+      setRequests(srList);
+      setClients(clientCache);
+      setQuotations(qMap);
+      setLoading(false);
+    };
+
+    load();
+  }, []);
+
+  const acceptQuotation = async (q: Quotation) => {
+    const marginValue = marginMap[q.id];
+    if (!marginValue) {
+      alert("Please enter margin before accepting");
+      return;
     }
+
+    const margin = Number(marginValue);
+
+    const productsWithMargin = q.products.map((p) => {
+      const baseTotal = (p.price || 0) * p.quantity;
+      return {
+        ...p,
+        baseTotal,
+        margin,
+        finalTotal: baseTotal + margin,
+      };
+    });
+
+    await addDoc(collection(db, "finalOrders"), {
+      supplierRequestId: q.supplierRequestId,
+      clientId: q.clientId,
+      supplierEmail: q.supplierEmail,
+      products: productsWithMargin,
+      createdAt: serverTimestamp(),
+    });
+
+    await updateDoc(doc(db, "quotations", q.id), { status: "accepted" });
+
+    const related = quotations[q.supplierRequestId] || [];
+    for (const other of related) {
+      if (other.id !== q.id) {
+        await updateDoc(doc(db, "quotations", other.id), { status: "lost" });
+      }
+    }
+
+    await updateDoc(
+      doc(db, "supplierRequests", q.supplierRequestId),
+      { status: "accepted" }
+    );
+
+
+    setRequests((prev) =>
+      prev.filter((r) => r.id !== q.supplierRequestId)
+    );
+
+    setQuotations((prev) => {
+      const copy = { ...prev };
+      delete copy[q.supplierRequestId];
+      return copy;
+    });
   };
 
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <div className="flex justify-between mb-6 items-center">
+      <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-        <div className="flex gap-4">
-          <button 
+
+        <div className="flex gap-3">
+          <button
             onClick={() => router.push("/admin/requests")}
-            className="bg-black text-white px-4 py-2 rounded"
+            className="bg-blue-600 text-white px-4 py-2 rounded"
           >
-            Go to Client Requests
+            Requests ({pendingCount})
           </button>
+
+          <button
+            onClick={() => router.push("/admin/final-orders")}
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Final Orders
+          </button>
+
           <SignOutButton>
-            <button className="bg-red-600 text-white px-4 py-2 rounded">Sign Out</button>
+            <button className="bg-red-600 text-white px-4 py-2 rounded">
+              Sign Out
+            </button>
           </SignOutButton>
         </div>
       </div>
 
-      {requests.map(req => (
-        <div key={req.id} className="bg-white p-6 rounded shadow mb-6">
-          <h2 className="font-semibold text-lg">{req.product.title}</h2>
-          <p className="text-sm text-gray-600">{req.product.variant} | {req.product.specification}</p>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {requests.map((req) => {
+          const client = clients[req.clientId];
+          const qs = quotations[req.id] || [];
 
-          <div className="flex gap-4 mt-3 mb-3">
-            <div className="relative w-20 h-20">
-              <Image src={req.product.image} alt={req.product.title} fill className="object-cover rounded" />
-            </div>
-            <div>
-              <p><b>Quantity:</b> {req.product.quantity}</p>
-            </div>
-          </div>
+          return (
+            <div key={req.id} className="bg-white p-4 rounded shadow">
+              <h3 className="font-medium">{client?.name}</h3>
+              <p className="text-sm text-gray-600">{client?.address}</p>
 
-          {!req.finalOrder && (
-            <>
-              <h4 className="font-semibold mb-2">Supplier Quotes:</h4>
-              {quotationsMap[req.id]?.map(q => (
-                <div key={q.id} className="flex justify-between items-center border p-2 rounded mb-2">
-                  <span>{q.supplierEmail} — ₹{q.price}</span>
-                  {q.status === "under_review" && (
-                    <button onClick={() => acceptQuotation(req, q)} className="bg-green-600 text-white px-3 py-1 rounded">
-                      Accept
-                    </button>
-                  )}
-                </div>
-              ))}
-            </>
-          )}
-
-          {req.finalOrder && (
-            <div className="mt-4 p-4 border-l-4 border-green-500 bg-green-50 rounded">
-              <h4 className="font-semibold mb-2 text-green-700">Final Order</h4>
-              <p><b>Supplier:</b> {req.finalOrder.supplierEmail}</p>
-              <p><b>Supplier Price:</b> ₹{req.finalOrder.supplierPrice}</p>
-              <p><b>Margin:</b> ₹{req.finalOrder.margin}</p>
-              <p className="text-lg font-semibold"><b>Final Price:</b> ₹{req.finalOrder.finalPrice}</p>
-              <button className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Send Request to Client
+              <button
+                onClick={() => setModalRequest(req)}
+                className="text-blue-600 text-sm mt-2"
+              >
+                View Request Details
               </button>
+
+              <div className="mt-3 space-y-3">
+                {qs.map((q) => (
+                  <div key={q.id} className="border p-3 rounded">
+                    <p className="font-medium">{q.supplierEmail}</p>
+
+                    {q.products.map((p) => (
+                      <p key={p.productId} className="text-sm">
+                        {p.title}: ₹{p.price} × {p.quantity}
+                      </p>
+                    ))}
+
+                    <input
+                      type="number"
+                      placeholder="Margin"
+                      className="border px-2 py-1 w-full mt-2 rounded"
+                      value={marginMap[q.id] || ""}
+                      onChange={(e) =>
+                        setMarginMap((prev) => ({
+                          ...prev,
+                          [q.id]: e.target.value,
+                        }))
+                      }
+                    />
+
+                    <button
+                      onClick={() => acceptQuotation(q)}
+                      className="mt-2 bg-green-600 text-white px-3 py-1 rounded w-full"
+                    >
+                      Accept Quotation
+                    </button>
+                  </div>
+                ))}
+
+                {qs.length === 0 && (
+                  <p className="text-sm text-gray-500">No quotations yet</p>
+                )}
+              </div>
             </div>
-          )}
+          );
+        })}
+      </div>
+
+      {modalRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-full max-w-lg relative">
+            <button
+              onClick={() => setModalRequest(null)}
+              className="absolute top-2 right-3 text-lg"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-xl font-semibold mb-3">
+              {clients[modalRequest.clientId]?.name}
+            </h2>
+
+            <ul className="space-y-2">
+              {modalRequest.products.map((p) => (
+                <li key={p.productId} className="border p-2 rounded">
+                  <p className="font-medium">{p.title}</p>
+                  <p>Qty: {p.quantity}</p>
+                  {p.variant && <p>Variant: {p.variant}</p>}
+                  {p.specification && <p>Spec: {p.specification}</p>}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }

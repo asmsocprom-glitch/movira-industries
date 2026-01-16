@@ -6,11 +6,12 @@ import {
   collection,
   getDocs,
   query,
-  orderBy,
   where,
+  orderBy,
   addDoc,
   serverTimestamp,
-  DocumentData,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
@@ -18,238 +19,262 @@ import Image from "next/image";
 interface Product {
   productId: string;
   title: string;
-  category: string;
+  quantity: number;
   variant: string;
   specification: string;
   image: string;
-  quantity: number;
+  price?: number;
+  totalPrice?: number;
 }
 
 interface SupplierRequest {
   id: string;
-  product: Product;
+  clientId: string;
+  products: Product[];
+}
+
+interface Client {
+  name: string;
+  address: string;
 }
 
 interface Quotation {
   id: string;
   supplierRequestId: string;
+  clientId: string;
   supplierEmail: string;
-  price: number;
-  status: "under_review" | "accepted" | "lost";
-  product: Product;
-}
-
-interface SupplierAction {
-  supplierRequestId: string;
-  supplierEmail: string;
-  action: "rejected";
+  products: Product[];
+  status: "under_review" | "accepted" | "rejected";
 }
 
 export default function SupplierDashboard() {
   const { user } = useUser();
   const supplierEmail = user?.primaryEmailAddress?.emailAddress || "";
 
-  const [newRequests, setNewRequests] = useState<SupplierRequest[]>([]);
-  const [myQuotations, setMyQuotations] = useState<Quotation[]>([]);
+  const [requests, setRequests] = useState<SupplierRequest[]>([]);
+  const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const [clients, setClients] = useState<Record<string, Client>>({});
   const [prices, setPrices] = useState<Record<string, string>>({});
-  const [processing, setProcessing] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!supplierEmail) return;
 
-    const fetchData = async () => {
+    const loadData = async () => {
       setLoading(true);
-      try {
-        // All supplier requests
-        const reqSnap = await getDocs(
-          query(collection(db, "supplierRequests"), orderBy("createdAt", "desc"))
-        );
 
-        const allRequests: SupplierRequest[] = reqSnap.docs.map(doc => {
-          const data = doc.data() as { product: Product };
-          return { id: doc.id, product: data.product };
+      const quotationSnap = await getDocs(
+        query(
+          collection(db, "quotations"),
+          where("supplierEmail", "==", supplierEmail),
+          orderBy("createdAt", "desc")
+        )
+      );
+
+      const allQuotations: Quotation[] = quotationSnap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Quotation, "id">),
+      }));
+
+      const visibleQuotations = allQuotations.filter(
+        (q) => q.status !== "rejected"
+      );
+
+      setQuotations(visibleQuotations);
+
+      const quotedRequestIds = new Set(
+        visibleQuotations.map((q) => q.supplierRequestId)
+      );
+
+      const requestSnap = await getDocs(collection(db, "supplierRequests"));
+      const reqList: SupplierRequest[] = [];
+      const clientCache: Record<string, Client> = {};
+
+      for (const d of requestSnap.docs) {
+        const data = d.data();
+        if (quotedRequestIds.has(d.id)) continue;
+
+        reqList.push({
+          id: d.id,
+          clientId: data.clientId,
+          products: data.products,
         });
 
-        // Supplier's quotations
-        const quoteSnap = await getDocs(
-          query(collection(db, "quotations"), where("supplierEmail", "==", supplierEmail))
-        );
-        const quotes: Quotation[] = quoteSnap.docs.map(doc => {
-          const data = doc.data() as DocumentData;
-          return {
-            id: doc.id,
-            supplierRequestId: data.supplierRequestId,
-            supplierEmail: data.supplierEmail,
-            price: data.price,
-            status: data.status,
-            product: data.product as Product,
-          };
-        });
-
-        // Supplier rejected actions
-        const actionSnap = await getDocs(
-          query(
-            collection(db, "supplierActions"),
-            where("supplierEmail", "==", supplierEmail),
-            where("action", "==", "rejected")
-          )
-        );
-        const rejectedIds = new Set<string>();
-        actionSnap.docs.forEach(doc => {
-          const data = doc.data() as SupplierAction;
-          rejectedIds.add(data.supplierRequestId);
-        });
-
-        // Filter new requests (not quoted and not rejected)
-        const quotedIds = new Set(quotes.map(q => q.supplierRequestId));
-        const filteredRequests = allRequests.filter(
-          r => !quotedIds.has(r.id) && !rejectedIds.has(r.id)
-        );
-
-        setNewRequests(filteredRequests);
-        setMyQuotations(quotes);
-      } catch (err) {
-        console.error("Error fetching supplier data:", err);
-      } finally {
-        setLoading(false);
+        if (!clientCache[data.clientId]) {
+          const cSnap = await getDoc(doc(db, "clients", data.clientId));
+          if (cSnap.exists()) clientCache[data.clientId] = cSnap.data() as Client;
+        }
       }
+
+      for (const q of visibleQuotations) {
+        if (!clientCache[q.clientId]) {
+          const cSnap = await getDoc(doc(db, "clients", q.clientId));
+          if (cSnap.exists()) clientCache[q.clientId] = cSnap.data() as Client;
+        }
+      }
+
+      setRequests(reqList);
+      setClients(clientCache);
+      setLoading(false);
     };
 
-    fetchData();
+    loadData();
   }, [supplierEmail]);
 
-  const acceptRequest = async (req: SupplierRequest) => {
-    const priceInput = prices[req.id];
-    if (!priceInput) return alert("Please enter a price.");
-
-    if (!confirm("Are you sure you want to submit this quotation?")) return;
-
-    setProcessing(prev => ({ ...prev, [req.id]: true }));
-
-    try {
-      const price = Number(priceInput);
-      await addDoc(collection(db, "quotations"), {
-        supplierRequestId: req.id,
-        supplierEmail,
-        product: req.product,
-        price,
-        status: "under_review",
-        createdAt: serverTimestamp(),
+  const submitQuotation = async (req: SupplierRequest) => {
+    const selectedProducts = req.products
+      .filter((p) => prices[`${req.id}_${p.productId}`])
+      .map((p) => {
+        const price = Number(prices[`${req.id}_${p.productId}`]);
+        return {
+          ...p,
+          price,
+          totalPrice: price * p.quantity,
+        };
       });
 
-      setNewRequests(prev => prev.filter(r => r.id !== req.id));
-      setMyQuotations(prev => [
-        ...prev,
-        { id: Math.random().toString(), supplierRequestId: req.id, supplierEmail, price, status: "under_review", product: req.product },
-      ]);
-    } catch {
-      alert("Failed to submit quotation.");
-    } finally {
-      setProcessing(prev => ({ ...prev, [req.id]: false }));
+    if (!selectedProducts.length) {
+      alert("Please enter at least one price before submitting.");
+      return;
     }
+
+    await addDoc(collection(db, "quotations"), {
+      supplierRequestId: req.id,
+      clientId: req.clientId,
+      supplierEmail,
+      products: selectedProducts,
+      status: "under_review",
+      createdAt: serverTimestamp(),
+    });
+
+    alert("Quotation submitted successfully");
+    window.location.reload();
   };
 
   const rejectRequest = async (req: SupplierRequest) => {
-    if (!confirm("Are you sure you want to reject this request?")) return;
+    if (!confirm("Reject this request?")) return;
 
-    setProcessing(prev => ({ ...prev, [req.id]: true }));
+    await addDoc(collection(db, "quotations"), {
+      supplierRequestId: req.id,
+      clientId: req.clientId,
+      supplierEmail,
+      products: req.products,
+      status: "rejected",
+      createdAt: serverTimestamp(),
+    });
 
-    try {
-      await addDoc(collection(db, "supplierActions"), {
-        supplierRequestId: req.id,
-        supplierEmail,
-        action: "rejected",
-        createdAt: serverTimestamp(),
-      });
-
-      setNewRequests(prev => prev.filter(r => r.id !== req.id));
-    } catch {
-      alert("Failed to reject request.");
-    } finally {
-      setProcessing(prev => ({ ...prev, [req.id]: false }));
-    }
+    alert("Request rejected");
+    setRequests((prev) => prev.filter((r) => r.id !== req.id));
   };
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) return <p className="p-6 min-h-screen">Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between mb-8">
           <h1 className="text-2xl font-semibold">Supplier Dashboard</h1>
           <SignOutButton>
-            <button className="bg-black text-white px-4 py-2 rounded">Sign Out</button>
+            <button className="bg-black text-white px-4 py-2 rounded">
+              Sign Out
+            </button>
           </SignOutButton>
         </div>
 
-        <Section title="New Requests">
-          {newRequests.map(req => (
-            <Card key={req.id}>
-              <ProductDisplay product={req.product} />
-              <div className="flex gap-3 mt-3">
-                <input
-                  type="number"
-                  placeholder="Enter price"
-                  value={prices[req.id] || ""}
-                  onChange={e => setPrices({ ...prices, [req.id]: e.target.value })}
-                  className="border px-3 py-2 rounded w-40"
-                />
+        <h2 className="text-xl font-semibold mb-4">Pending Requests</h2>
+        {requests.length === 0 && <p className="text-gray-500">No pending requests</p>}
+
+        {requests.map((req) => {
+          const client = clients[req.clientId];
+          return (
+            <div key={req.id} className="bg-white p-6 rounded mb-6 shadow">
+              <p className="font-medium mb-3">
+                {client?.name} — {client?.address}
+              </p>
+
+              {req.products.map((p) => {
+                const price = Number(prices[`${req.id}_${p.productId}`] || 0);
+                const total = price * p.quantity;
+
+                return (
+                  <div key={p.productId} className="flex gap-4 mb-3 items-center">
+                    <div className="relative w-16 h-16">
+                      <Image src={p.image} alt={p.title} fill className="object-contain" />
+                    </div>
+                    <div className="flex-1">
+                      <p>{p.title}</p>
+                      <p className="text-sm">
+                        {p.variant} | Qty: {p.quantity}
+                      </p>
+                      {price > 0 && (
+                        <p className="text-sm font-medium">
+                          Total: ₹ {total}
+                        </p>
+                      )}
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Price per piece"
+                      className="border px-3 py-2 w-36 rounded"
+                      value={prices[`${req.id}_${p.productId}`] || ""}
+                      onChange={(e) =>
+                        setPrices((prev) => ({
+                          ...prev,
+                          [`${req.id}_${p.productId}`]: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                );
+              })}
+
+              <div className="flex gap-3 mt-4">
                 <button
-                  disabled={processing[req.id]}
-                  onClick={() => acceptRequest(req)}
-                  className="bg-green-600 text-white px-4 py-2 rounded"
+                  onClick={() => submitQuotation(req)}
+                  className="bg-green-600 text-white px-5 py-2 rounded"
                 >
-                  Accept
+                  Submit Quotation
                 </button>
                 <button
-                  disabled={processing[req.id]}
                   onClick={() => rejectRequest(req)}
-                  className="border px-4 py-2 rounded"
+                  className="bg-red-600 text-white px-5 py-2 rounded"
                 >
                   Reject
                 </button>
               </div>
-            </Card>
-          ))}
-        </Section>
+            </div>
+          );
+        })}
 
-        <Section title="My Quotations">
-          {myQuotations.map(q => (
-            <Card key={q.id}>
-              <ProductDisplay product={q.product} />
-              <p className="text-sm mt-2">
-                {q.status === "under_review" ? "Waiting for admin decision" : q.status === "accepted" ? "Accepted by Admin" : "Not Selected"}
+        <h2 className="text-xl font-semibold mt-12 mb-4">My Quotations</h2>
+        {quotations.length === 0 && <p className="text-gray-500">No quotations</p>}
+
+        {quotations.map((q) => {
+          const client = clients[q.clientId];
+          return (
+            <div key={q.id} className="bg-white p-6 rounded mb-6 border">
+              <p className="font-medium mb-1">
+                {client?.name} — {client?.address}
               </p>
-              <p className="text-sm font-semibold mt-1">Price: ₹{q.price}</p>
-            </Card>
-          ))}
-        </Section>
+
+              {q.products.map((p) => (
+                <div key={p.productId} className="flex justify-between text-sm mb-1">
+                  <span>
+                    {p.title} × {p.quantity}
+                  </span>
+                  <span>
+                    ₹ {p.price} | Total ₹ {p.totalPrice}
+                  </span>
+                  <span>
+                    {q.status}
+                  </span>
+                </div>
+                
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
-
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div className="mb-10">
-    <h2 className="text-xl font-semibold mb-4">{title}</h2>
-    {Array.isArray(children) && children.length === 0 ? <p className="text-gray-500">No items</p> : <div className="space-y-4">{children}</div>}
-  </div>
-);
-
-const Card = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-white p-5 rounded-lg shadow">{children}</div>
-);
-
-const ProductDisplay = ({ product }: { product: Product }) => (
-  <div className="flex gap-4">
-    <div className="relative w-20 h-20">
-      <Image src={product.image} alt={product.title} fill className="object-cover rounded" />
-    </div>
-    <div>
-      <h3 className="font-medium">{product.title}</h3>
-      <p className="text-sm">{product.variant}</p>
-      <p className="text-sm">Qty: {product.quantity}</p>
-    </div>
-  </div>
-);

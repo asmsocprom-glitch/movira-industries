@@ -1,29 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { collection, getDocs, doc, getDoc, updateDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Image from "next/image";
 
-interface ProductRequest {
-  id: string;
-  clientId: string;
+interface Product {
   productId: string;
   title: string;
-  category: string;
   variant: string;
   specification: string;
-  quantity: number;
+  quantity: string;
   image: string;
-  status: string;
+}
+
+interface ClientRequest {
+  id: string;
+  clientId: string;
+  products: Product[];
+  status: "pending" | "accepted" | "rejected";
 }
 
 interface Client {
@@ -33,169 +29,113 @@ interface Client {
   address: string;
 }
 
-const AdminRequestsPage = () => {
-  const [requests, setRequests] = useState<ProductRequest[]>([]);
+export default function AdminRequestsPage() {
+  const router = useRouter();
+  const [requests, setRequests] = useState<ClientRequest[]>([]);
+  const [clients, setClients] = useState<Record<string, Client>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "clientRequests"));
-        const reqData = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as ProductRequest[];
+    const fetchData = async () => {
+      setLoading(true);
 
-        setRequests(reqData.filter((r) => r.status === "pending"));
-      } catch (err) {
-        console.error("Error fetching requests:", err);
-      } finally {
-        setLoading(false);
+      const snap = await getDocs(collection(db, "clientRequests"));
+      const pendingRequests = snap.docs
+        .map(d => ({ id: d.id, ...d.data() })) as ClientRequest[];
+      const filtered = pendingRequests.filter(r => r.status === "pending");
+
+      const clientCache: Record<string, Client> = {};
+      for (const r of filtered) {
+        if (!clientCache[r.clientId]) {
+          const clientSnap = await getDoc(doc(db, "clients", r.clientId));
+          if (clientSnap.exists()) clientCache[r.clientId] = clientSnap.data() as Client;
+        }
       }
+
+      setClients(clientCache);
+      setRequests(filtered);
+      setLoading(false);
     };
 
-    fetchRequests();
+    fetchData();
   }, []);
 
-  const rejectRequest = async (req: ProductRequest) => {
-    if (!window.confirm("Reject this request?")) return;
+  const handleAccept = async (req: ClientRequest) => {
+    if (!confirm("Accept this request and send to suppliers?")) return;
 
-    await updateDoc(doc(db, "clientRequests", req.id), {
-      status: "rejected",
-      rejectedAt: serverTimestamp(),
-    });
-    setRequests((prev) => prev.filter((r) => r.id !== req.id));
-  };
-
-  const acceptRequest = async (req: ProductRequest) => {
-    if (!window.confirm("Approve & send to suppliers?")) return;
-
-    await updateDoc(doc(db, "clientRequests", req.id), {
-      status: "approved",
-      approvedAt: serverTimestamp(),
-    });
-
+    await updateDoc(doc(db, "clientRequests", req.id), { status: "accepted", acceptedAt: serverTimestamp() });
     await addDoc(collection(db, "supplierRequests"), {
       clientRequestId: req.id,
       clientId: req.clientId,
-      product: {
-        productId: req.productId,
-        title: req.title,
-        category: req.category,
-        variant: req.variant,
-        specification: req.specification,
-        quantity: req.quantity,
-        image: req.image,
-      },
+      products: req.products,
       status: "pending",
       createdAt: serverTimestamp(),
     });
 
-    setRequests((prev) => prev.filter((r) => r.id !== req.id));
+    setRequests(prev => prev.filter(r => r.id !== req.id));
   };
+
+  const handleReject = async (req: ClientRequest) => {
+    if (!confirm("Reject this request?")) return;
+
+    await updateDoc(doc(db, "clientRequests", req.id), { status: "rejected", rejectedAt: serverTimestamp() });
+    setRequests(prev => prev.filter(r => r.id !== req.id));
+  };
+
+  if (loading) return <p className="p-6 min-h-screen">Loading...</p>;
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] p-8 font-Int">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-6">Client Requests</h1>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <button
+          onClick={() => router.push("/admin")}
+          className="mb-4 px-4 py-2 bg-gray-700 text-white rounded"
+        >
+          &larr; Back to Dashboard
+        </button>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : requests.length === 0 ? (
+        <h1 className="text-2xl font-semibold mb-4">Pending Client Requests</h1>
+
+        {requests.length === 0 ? (
           <p className="text-gray-500">No pending requests</p>
-        ) : (
-          <div className="space-y-6">
-            {requests.map((req) => (
-              <ClientRequestCard
-                key={req.id}
-                req={req}
-                rejectRequest={rejectRequest}
-                acceptRequest={acceptRequest}
-              />
-            ))}
-          </div>
-        )}
+        ) : requests.map(req => {
+          const client = clients[req.clientId];
+          return (
+            <div key={req.id} className="bg-white border rounded-lg p-6 space-y-4">
+              <div>
+                <h2 className="font-semibold">{client?.name || "Unknown Client"}</h2>
+                <p className="text-sm text-gray-600">{client?.email || "N/A"} | {client?.phone || "N/A"}</p>
+                <p className="text-sm text-gray-600">{client?.address || "N/A"}</p>
+              </div>
+
+              <div className="space-y-2">
+                {req.products.map(p => (
+                  <div key={p.productId} className="flex gap-4 border rounded p-3">
+                    <div className="relative w-20 h-20 border rounded overflow-hidden">
+                      <Image src={p.image} alt={p.title} fill className="object-cover" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{p.title}</p>
+                      <p className="text-sm">Variant: {p.variant}</p>
+                      <p className="text-sm">Spec: {p.specification}</p>
+                      <p className="text-sm">Qty: {p.quantity}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-3 mt-3">
+                <button onClick={() => handleAccept(req)} className="px-4 py-2 bg-black text-white rounded">
+                  Accept
+                </button>
+                <button onClick={() => handleReject(req)} className="px-4 py-2 border rounded">
+                  Reject
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
-};
-
-const ClientRequestCard = ({
-  req,
-  rejectRequest,
-  acceptRequest,
-}: {
-  req: ProductRequest;
-  rejectRequest: (req: ProductRequest) => void;
-  acceptRequest: (req: ProductRequest) => void;
-}) => {
-  const [client, setClient] = useState<Client | null>(null);
-
-  useEffect(() => {
-    const fetchClient = async () => {
-      const snap = await getDoc(doc(db, "clients", req.clientId));
-      if (snap.exists()) setClient(snap.data() as Client);
-    };
-    fetchClient();
-  }, [req.clientId]);
-
-  return (
-    <div className="bg-white border rounded-xl p-6">
-      <div className="mb-4">
-        <h2 className="font-semibold text-lg">
-          {client?.name || "Unknown Client"}
-        </h2>
-        <p className="text-sm text-gray-600">
-          {client?.email || "N/A"} | {client?.phone || "N/A"}
-        </p>
-        <p className="text-sm text-gray-600">
-          {client?.address || "N/A"}
-        </p>
-      </div>
-
-      <div className="flex gap-4">
-        <div className="relative w-24 h-24 border rounded overflow-hidden">
-          <Image
-            src={req.image}
-            alt={req.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-
-        <div>
-          <h3 className="font-medium">{req.title}</h3>
-          <p className="text-sm">
-            <b>Category:</b> {req.category}
-          </p>
-          <p className="text-sm">
-            <b>Variant:</b> {req.variant}
-          </p>
-          <p className="text-sm">
-            <b>Spec:</b> {req.specification}
-          </p>
-          <p className="text-sm">
-            <b>Qty:</b> {req.quantity}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex gap-3 mt-4">
-        <button
-          onClick={() => acceptRequest(req)}
-          className="px-4 py-2 bg-green-600 text-white rounded"
-        >
-          Approve
-        </button>
-        <button
-          onClick={() => rejectRequest(req)}
-          className="px-4 py-2 bg-red-600 text-white rounded"
-        >
-          Reject
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default AdminRequestsPage;
+}
