@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-// import { SignInCTA } from "./SignInButton";
+import { useUser } from "@clerk/nextjs";
 
 interface NavLink {
   label: string;
@@ -18,13 +18,11 @@ const navLinks: NavLink[] = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const isCartPage = pathname === "/cart";
-  // 🔹 ALL hooks must be called first
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const { isSignedIn } = useUser();
 
   const toggleMenu = useCallback(() => {
-    setIsOpen((prev) => !prev);
+    setIsOpen(prev => !prev);
     document.body.style.overflow = isOpen ? "auto" : "hidden";
   }, [isOpen]);
 
@@ -33,41 +31,22 @@ export default function Navbar() {
     document.body.style.overflow = "auto";
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const scrollToFooter = () => {
-    const footer = document.getElementById("footer");
-    footer?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // 🔹 NOW safe to conditionally return
   if (pathname.startsWith("/supplier") || pathname.startsWith("/admin")) {
     return null;
   }
 
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full py-4 z-30 uppercase font-Play text-white transition-colors duration-500 ${
-  scrolled || isCartPage
-    ? "bg-[#1C1C1C] shadow-lg"
-    : "bg-transparent"
-}`}
-
-    >
+    <nav className="fixed top-0 left-0 w-full py-4 z-30 uppercase font-Play text-white bg-[#1C1C1C] shadow-lg">
       <div className="flex items-center justify-between mx-5 md:mx-10 lg:mx-20 py-2">
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/logo2.png"
             alt="Movira Industries Logo"
-            quality={100}
             width={100}
             height={100}
             priority
@@ -84,42 +63,42 @@ export default function Navbar() {
             <li key={label} className="relative group">
               <Link href={href} className="px-1">
                 {label}
-                <span className="absolute left-0 -bottom-1 w-0 bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
+                <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
               </Link>
             </li>
           ))}
-          <button onClick={scrollToFooter} className="uppercase">
-            Contact Us
-          </button>
+
+          <button onClick={scrollToFooter}>Contact Us</button>
+
           <Link href="/cart">
-            <svg className="w-6 h-6 text-white-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z" clipRule="evenodd"/>
+            <svg
+              className="w-6 h-6"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z"
+                clipRule="evenodd"
+              />
             </svg>
           </Link>
-          {/* <SignInCTA /> */}
+
+          {isSignedIn ? (
+            <Link href="/auth/redirect">PROFILE</Link>
+          ) : (
+            <Link href="/sign-in">SIGN IN</Link>
+          )}
         </ul>
 
-
-        {/* Hamburger Icon */}
+        {/* Mobile Menu Button */}
         <button
           className="md:hidden z-50 flex flex-col justify-center items-center w-10 h-10 space-y-1"
           onClick={toggleMenu}
         >
-          <span
-            className={`block h-0.5 w-6 bg-white transition ${
-              isOpen ? "rotate-45 translate-y-1.5" : ""
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-6 bg-white ${
-              isOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-6 bg-white transition ${
-              isOpen ? "-rotate-45 -translate-y-1.5" : ""
-            }`}
-          />
+          <span className={`h-0.5 w-6 bg-white transition ${isOpen ? "rotate-45 translate-y-1.5" : ""}`} />
+          <span className={`h-0.5 w-6 bg-white ${isOpen ? "opacity-0" : ""}`} />
+          <span className={`h-0.5 w-6 bg-white transition ${isOpen ? "-rotate-45 -translate-y-1.5" : ""}`} />
         </button>
       </div>
 
@@ -130,11 +109,11 @@ export default function Navbar() {
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b border-gray-500">
-          <span className="text-xl font-semibold">Options</span>
+          <span className="text-xl">Menu</span>
           <button onClick={closeMenu}>✕</button>
         </div>
 
-        <ul className="flex flex-col p-4 space-y-4">
+        <ul className="flex flex-col p-6 space-y-6">
           {navLinks.map(({ label, href }) => (
             <li key={label}>
               <Link href={href} onClick={closeMenu}>
@@ -142,11 +121,16 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
-          <Link href="/cart">
-            <svg className="w-8 h-8 text-white-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z" clipRule="evenodd"/>
-            </svg>
-          </Link>
+
+          {isSignedIn ? (
+            <Link href="/auth/redirect" onClick={closeMenu}>
+              PROFILE
+            </Link>
+          ) : (
+            <Link href="/sign-in" onClick={closeMenu}>
+              SIGN IN
+            </Link>
+          )}
         </ul>
       </div>
     </nav>

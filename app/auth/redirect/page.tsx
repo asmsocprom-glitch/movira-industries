@@ -1,24 +1,27 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function AuthRedirectPage() {
-  const { userId } = await auth();
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
+export default function AuthRedirectPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
 
-  const user = await currentUser();
-  const role = user?.publicMetadata?.role;
+  useEffect(() => {
+    if (!isLoaded) return;
 
-  if (role === "admin") {
-    redirect("/admin");
-  }
+    if (!user) {
+      router.replace("/sign-in");
+      return;
+    }
 
-  if (role === "supplier") {
-    redirect("/supplier");
-  }
+    const role = user.publicMetadata?.role;
+    if (role === "admin") router.replace("/admin");
+    else if (role === "supplier") router.replace("/supplier");
+    else if (role === "client") router.replace("/client");
+    else router.replace("/select-role");
+  }, [user, isLoaded, router]);
 
-  // fallback (optional)
-  redirect("/");
+  return <div className="h-screen flex items-center justify-center">Redirecting...</div>;
 }

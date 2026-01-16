@@ -41,14 +41,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      afterSignInUrl="/auth/redirect"
+      afterSignUpUrl="/select-role"
+    >
       <html lang="en">
         <body
           className={`${geistSans.variable} ${int.variable} ${playfair.variable} ${geistMono.variable} antialiased`}
         >
           <Navbar />
 
-          <main>
+          <main className="flex-1 pt-20">
             {children}
           </main>
 
