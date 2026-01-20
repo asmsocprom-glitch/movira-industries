@@ -30,96 +30,65 @@ const faqData: FAQItem[] = [
       "You can contact our office or email us with your company profile and requirements. We welcome long-term collaborations with reliable partners and contractors.",
   },
   {
-    question: "Where can I rent scaffolding and construction equipment in Mumbai?",
-    answer:
-      "You can rent high-quality scaffolding and formwork equipment directly from Movira Industries LLP. We supply cuplocks, props, ledgers, pipes, and accessories with fast delivery across Mumbai, Thane, and Navi Mumbai.",
-  },
-  {
-    question: "What is the difference between Cuplock and H-frame scaffolding?",
-    answer:
-      "Cuplock scaffolding is modular and ideal for heavy-duty structures, while H-frame scaffolding is simpler and best for smaller-scale work. Movira Industries provides both depending on your project needs.",
-  },
-  {
-    question: "Do you supply adjustable props and centering materials?",
-    answer:
-      "Yes, we provide adjustable props, spans, and centering materials used for slab and shuttering support. All items are well-maintained and available for rent.",
-  },
-  {
     question: "How fast can you deliver scaffolding material in Mumbai?",
     answer:
       "Most standard scaffolding and formwork materials can be delivered within 24–48 hours across Mumbai and nearby areas.",
   },
-  {
-    question: "Do you supply for infrastructure or government projects?",
-    answer:
-      "Yes, Movira Industries has supplied scaffolding and formwork systems for major infrastructure projects including bridges, flyovers, and large building developments.",
-  },
-  {
-    question: "Why choose Movira Industries for scaffolding rental?",
-    answer:
-      "Because we focus on quality, professionalism, and on-time service. Every item is inspected, maintained, and delivered safely to help you complete your project efficiently.",
-  },
 ];
-
-function FAQ() {
+export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const toggleFAQ = (index: number) =>
-    setOpenIndex(openIndex === index ? null : index);
 
   return (
-    <section className="relative flex justify-center px-4 py-16 bg-[#0a1e2a]">
-      <div className="w-full max-w-6xl">
-        {/* Section Heading */}
-        <h3 className="text-[26px] md:text-4xl font-Play font-semibold text-[#f1f1f1] pb-12 text-center tracking-wide">
-          Frequently Asked Questions
-        </h3>
+    <section className="bg-[#F7F7F7] px-4 py-20 font-Manrope">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-[28px] md:text-4xl font-semibold text-[#1C1C1C]">
+            Frequently Asked Questions
+          </h2>
+          <p className="mt-3 text-gray-600 text-base md:text-lg">
+            Clear answers to common questions about our services and materials.
+          </p>
+          <div className="w-20 h-0.5 bg-[#C2A356] mx-auto mt-6" />
+        </div>
 
-        {/* FAQ Cards */}
-        <div className="grid grid-cols-1 gap-6">
-          {faqData.map((faq, index) => (
-            <div
-              key={index}
-              className={`relative rounded-xl bg-[#f0f3f5] shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl`}
-            >
-              <button
-                aria-expanded={openIndex === index}
-                aria-controls={`faq-${index}`}
-                className="w-full py-4 px-6 flex items-center justify-between text-left text-base sm:text-lg font-medium focus:outline-none cursor-pointer transition-colors duration-300"
-                onClick={() => toggleFAQ(index)}
-              >
-                <span
-                  className={`${
-                    openIndex === index
-                      ? "text-[#111827]"
-                      : "text-gray-800"
-                  } transition-colors duration-300`}
-                >
-                  {faq.question}
-                </span>
-                {openIndex === index ? (
-                  <FiMinus className="text-lg text-[#00aaff] transition-transform duration-300" />
-                ) : (
-                  <FiPlus className="text-lg text-[#00aaff] transition-transform duration-300" />
-                )}
-              </button>
+        <div className="space-y-5">
+          {faqData.map((faq, index) => {
+            const isOpen = openIndex === index;
 
+            return (
               <div
-                id={`faq-${index}`}
-                className={`overflow-hidden text-gray-700 text-base sm:text-base transition-all duration-300 ease-in-out`}
-                style={{
-                  maxHeight: openIndex === index ? "300px" : "0px",
-                  padding: openIndex === index ? "0.75rem 1.5rem 1.5rem" : "0",
-                  transitionProperty: "max-height, padding",
-                }}
+                key={index}
+                className="bg-white border border-gray-200 rounded-xl shadow-sm
+                           hover:shadow-md transition-all duration-300"
               >
-                <p className="leading-relaxed">{faq.answer}</p>
+                <button
+                  className="w-full px-6 py-5 flex items-center justify-between
+                             text-left text-base md:text-lg font-medium text-[#1C1C1C]"
+                  onClick={() =>
+                    setOpenIndex(isOpen ? null : index)
+                  }
+                  aria-expanded={isOpen}
+                >
+                  <span>{faq.question}</span>
+                  <span className="ml-4 text-[#C2A356]">
+                    {isOpen ? <FiMinus /> : <FiPlus />}
+                  </span>
+                </button>
+
+                <div
+                  className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${
+                    isOpen ? "max-h-40 pb-6" : "max-h-0"
+                  }`}
+                >
+                  <p className="text-gray-600 leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
-
-export default FAQ;

@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import TopSection from "@/components/ui/TopSection";
 import products from "@/app/lib/product.json";
 
 const categories = [
@@ -23,60 +22,68 @@ export default function ProductsPage() {
       : products.filter((p) => p.category === activeCategory);
 
   return (
-    <div>
-      <TopSection title="Collection" />
-
-      <main className="bg-[#F8F8F8] min-h-screen py-16 px-4 md:px-12 lg:px-20 font-Int text-[#1C1C1C]">
-        <div className="flex flex-wrap justify-center gap-3 md:gap-6 mb-12">
+    <main className="font-Manrope bg-[#f7f6f2] text-[#1C1C1C]">
+      <section className="px-4 sm:px-8 md:px-16 lg:px-40 pt-20 pb-24">
+        <div className="flex flex-wrap gap-3 mb-14">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2 border-2 text-sm font-semibold uppercase tracking-wide transition duration-300 ${
-                activeCategory === cat
-                  ? "bg-[#1C1C1C] text-[#EAEAEA] border-[#1C1C1C]"
-                  : "border-[#1C1C1C] text-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#EAEAEA]"
-              }`}
+              className={`px-6 py-2 rounded-full text-sm font-semibold uppercase tracking-wide
+                border transition-all duration-300
+                ${
+                  activeCategory === cat
+                    ? "bg-[#1C1C1C] text-white border-[#1C1C1C]"
+                    : "bg-white text-[#1C1C1C] border-[#d6d6d6] hover:border-[#C2A356] hover:text-[#C2A356]"
+                }`}
             >
               {cat}
             </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300"
+              className="group bg-white rounded-2xl border border-[#e6e6e6]
+                         shadow-sm hover:shadow-xl transition-all duration-300
+                         flex flex-col overflow-hidden"
             >
-              <div className="relative w-full h-64">
+              <div className="relative w-full h-56 overflow-hidden">
                 <Image
                   src={product.image}
                   alt={product.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition duration-300"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
-              <div className="p-5 flex flex-col justify-between h-[220px]">
+              <div className="p-6 flex flex-col flex-1">
                 <div>
-                  <h2 className="font-Play uppercase text-lg mb-2">
+                  <h2 className="uppercase text-base font-semibold tracking-wide mb-2">
                     {product.title}
                   </h2>
-                  <p className="text-sm text-[#333333] leading-relaxed">
+                  <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
                     {product.description}
                   </p>
                 </div>
                 <Link
                   href={`/products/${product.slug}`}
-                  className="mt-4 inline-block border-2 border-[#1C1C1C] text-[#1C1C1C] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#1C1C1C] hover:text-[#EAEAEA] transition duration-300 text-center"
+                  className="mt-auto inline-block text-center uppercase tracking-wider text-sm font-semibold
+                             border border-[#C2A356] text-[#C2A356]
+                             px-5 py-2 rounded-sm
+                             hover:bg-[#C2A356] hover:text-black
+                             transition duration-300"
                 >
                   View Variants
                 </Link>
               </div>
             </div>
           ))}
+
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }

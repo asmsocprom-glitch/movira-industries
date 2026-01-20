@@ -1,9 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where, orderBy, limit, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  Timestamp,
+} from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { useUser, SignOutButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 interface ClientProfile {
   id: string;
@@ -45,6 +54,7 @@ export default function ClientDashboardPage() {
 
         const clientDoc = clientSnap.docs[0];
         const clientData = clientDoc.data();
+
         setClient({
           id: clientDoc.id,
           name: clientData.name,
@@ -53,13 +63,11 @@ export default function ClientDashboardPage() {
           address: clientData.address,
         });
 
-        // Fetch client requests
         const requestQuery = query(
           collection(db, "clientRequests"),
           where("clientId", "==", clientDoc.id),
           orderBy("createdAt", "desc")
         );
-        console.log(requestQuery)
 
         const requestSnap = await getDocs(requestQuery);
         const requestData: ClientRequest[] = requestSnap.docs.map((doc) => ({
@@ -79,46 +87,87 @@ export default function ClientDashboardPage() {
   }, [isLoaded, user]);
 
   if (!isLoaded) return null;
-  if (!user) return <div className="pt-24 text-center h-screen">Please sign in to view your dashboard.</div>;
-  if (loading) return <div className="pt-24 text-center h-screen">Loading dashboard...</div>;
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-Manrope">
+        <p>Please sign in to view your dashboard.</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-Manrope">
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen pt-24 pb-10 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6 space-y-6">
+    <main className="min-h-screen bg-[#f7f6f2] pt-24 pb-16 font-Manrope">
+      <div className="max-w-6xl mx-auto px-4 space-y-10">
 
-        {/* Logout button */}
-        <div className="flex justify-end">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Dashboard
+            </h1>
+
           <SignOutButton>
-            <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+            <button className="px-4 py-2 text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition">
               Logout
             </button>
           </SignOutButton>
         </div>
 
+        {/* PROFILE CARD */}
         {client && (
-          <div className="bg-white border rounded-xl p-5 shadow-sm">
-            <h1 className="text-2xl font-semibold mb-3">My Profile</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <section className="bg-white border border-[#e6e6e6] rounded-2xl p-6 shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">My Profile</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-800">
               <p><span className="font-medium">Name:</span> {client.name}</p>
               <p><span className="font-medium">Email:</span> {client.email}</p>
               <p><span className="font-medium">Phone:</span> {client.phone}</p>
               <p><span className="font-medium">Address:</span> {client.address}</p>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Client Requests */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">My Requests</h2>
+        {/* REQUESTS */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">My Requests</h2>
+            <Link
+              href="/products"
+              className="text-sm font-medium text-[#C2A356] hover:underline"
+            >
+              + Create New Request
+            </Link>
+          </div>
+
           {requests.length === 0 ? (
-            <p className="text-gray-500">No requests found.</p>
+            <div className="bg-white border border-dashed rounded-xl p-8 text-center">
+              <p className="text-gray-600 mb-4">
+                You haven’t placed any requests yet.
+              </p>
+              <Link
+                href="/products"
+                className="inline-block px-5 py-2 border border-black text-sm font-medium hover:bg-black hover:text-white transition"
+              >
+                Browse Products
+              </Link>
+            </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="space-y-4">
               {requests.map((req) => (
-                <div key={req.id} className="bg-white border rounded-xl p-4 shadow-sm">
-                  <div className="flex justify-between items-center">
+                <div
+                  key={req.id}
+                  className="bg-white border border-[#e6e6e6] rounded-xl p-5 shadow-sm"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <span
-                      className={`text-xs px-3 py-1 rounded-full capitalize ${
+                      className={`text-xs px-3 py-1 rounded-full capitalize font-medium ${
                         req.status === "pending"
                           ? "bg-yellow-100 text-yellow-700"
                           : req.status === "completed"
@@ -128,16 +177,18 @@ export default function ClientDashboardPage() {
                     >
                       {req.status}
                     </span>
+
+                    {req.createdAt && (
+                      <span className="text-xs text-gray-500">
+                        {req.createdAt.toDate().toLocaleString()}
+                      </span>
+                    )}
                   </div>
-                  {req.createdAt && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      {req.createdAt.toDate().toLocaleString()}
-                    </p>
-                  )}
-                  <div className="mt-3 space-y-1 text-sm">
+
+                  <div className="mt-4 space-y-1 text-sm text-gray-800">
                     {req.products.map((p, i) => (
                       <p key={i}>
-                        {p.title} — {p.quantity}
+                        {p.title} <span className="text-gray-500">× {p.quantity}</span>
                       </p>
                     ))}
                   </div>
@@ -145,8 +196,9 @@ export default function ClientDashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </section>
+
       </div>
-    </div>
+    </main>
   );
 }

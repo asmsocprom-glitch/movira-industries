@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Playfair_Display, Instrument_Sans } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 
-const int = Instrument_Sans({
-  variable: "--font-Int",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-Play",
+const manrope = Manrope({
+  variable: "--font-Manrope",
   subsets: ["latin"],
 });
 
@@ -47,16 +42,13 @@ export default function RootLayout({
     >
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${int.variable} ${playfair.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
         >
           <Navbar />
-
-          <main className="flex-1 pt-20">
+          <main className="flex-1 pt-20 bg-gray-50">
             {children}
           </main>
-
           <Footer />
-
           {/* WhatsApp Floating Button (unchanged) */}
           <a
             target="_blank"

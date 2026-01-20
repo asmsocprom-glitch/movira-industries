@@ -9,46 +9,52 @@ export default function FeaturedProducts() {
   const featuredProducts = products.slice(0, 4);
 
   return (
-    <section className="bg-[#0a1e2a] text-white py-16 px-4 md:px-12 lg:px-20 font-Int">
-      <div className="text-center mb-12">
-        <h2 className="font-Play text-[26px] md:text-4xl font-semibold mb-3">
+    <section className="bg-[#F7F7F7] text-[#1C1C1C] py-20 px-4 md:px-12 lg:px-24 font-Manrope">
+      <div className="text-center mb-16">
+        <h2 className="text-[28px] md:text-4xl font-semibold tracking-wide mb-4">
           Featured Products
         </h2>
-        <p className="text-white text-base md:text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
           A quick look at some of our most trusted scaffolding, formwork, and
           fabrication systems built for safety and precision.
         </p>
+        <div className="w-20 h-0.5 bg-[#C2A356] mx-auto mt-6" />
       </div>
 
-      {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {featuredProducts.map((product) => (
           <div
             key={product.id}
-            className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300"
+            className="group bg-white rounded-xl overflow-hidden
+                       shadow-sm hover:shadow-xl
+                       transition-all duration-300"
           >
-            <div className="relative w-full h-60">
+            <div className="relative w-full h-60 overflow-hidden">
               <Image
                 src={product.image}
                 alt={product.title}
                 fill
-                className="object-cover group-hover:scale-105 transition duration-300"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
 
-            <div className="p-5 flex flex-col justify-between h-68">
+            <div className="p-6 flex flex-col justify-between h-60">
               <div>
-                <h3 className="font-Play uppercase text-lg mb-2 text-black">
+                <h3 className="uppercase text-lg tracking-wide text-[#1C1C1C] mb-2">
                   {product.title}
                 </h3>
-                <p className="text-sm text-[#333333] leading-relaxed">
+                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
                   {product.description}
                 </p>
               </div>
 
               <Link
                 href={`/products/${product.slug}`}
-                className="font-Play mt-4 inline-block border-1 border-[#1C1C1C] rounded-sm text-[#1C1C1C] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#1C1C1C] hover:text-[#EAEAEA] transition duration-300 text-center"
+                className="mt-6 inline-block text-center uppercase tracking-wider text-sm
+                           border border-[#C2A356] text-[#C2A356]
+                           px-4 py-2 rounded-sm
+                           hover:bg-[#C2A356] hover:text-white
+                           transition duration-300"
               >
                 View Variants
               </Link>
@@ -57,10 +63,13 @@ export default function FeaturedProducts() {
         ))}
       </div>
 
-      <div className="flex justify-center mt-14">
+      <div className="flex justify-center mt-16">
         <Link
           href="/products"
-          className="px-6 py-2 rounded-sm text-sm border-1 border-gray-400 text-white uppercase tracking-wide hover:bg-white hover:text-black hover:border-black transition duration-300"
+          className="px-10 py-3 rounded-sm uppercase tracking-wider text-sm
+                     bg-[#1C1C1C] text-white
+                     hover:bg-[#C2A356] hover:text-black
+                     transition duration-300"
         >
           View All Products
         </Link>

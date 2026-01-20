@@ -9,7 +9,6 @@ export default function Home() {
     <div className="h-auto">
       <Hero />
       <FeaturedProducts />
-      {/* <ServicesArea/> */}
       <ReviewComponent/> 
       <FAQ/>
       

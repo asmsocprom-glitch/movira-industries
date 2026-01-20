@@ -1,63 +1,74 @@
 'use client';
 
 import React from 'react';
+import { FaQuoteLeft } from "react-icons/fa";
 
 const reviews = [
   {
     message:
       "Good quality material and always on time. We use Movira for all our scaffolding needs now very professional people to deal with.",
-    name: "Nikhilesh Jain<br />Tarksyaa Techo Pvt. Ltd.",
+    name: "Nikhilesh Jain",
+    company: "Tarksyaa Techo Pvt. Ltd.",
   },
   {
     message:
       "Movira gives reliable service. Pipes and props were clean, strong, and delivered exactly when promised. No delays, no issues.",
-    name: "Amit Sir<br />Aum Sai Constructions",
+    name: "Amit Sir",
+    company: "Aum Sai Constructions",
   },
   {
     message:
       "Very good experience. Material was in top condition and delivered fast. Their team is polite and easy to talk to real professionals.",
-    name: "Team MIPPL<br />Mumbai, India",
+    name: "Team MIPPL",
+    company: "Mumbai, India",
   },
 ];
 
 export default function ReviewComponent() {
   return (
     <section
-      className="relative py-20 px-6 sm:px-12 md:px-20 lg:px-32"
+      className="relative bg-[#ffffff] py-20 px-6 sm:px-12 md:px-20 lg:px-32 font-Manrope"
       aria-labelledby="client-reviews-heading"
     >
-      {/* Heading */}
-      <div className="relative z-10 max-w-4xl mx-auto text-center mb-16">
+      <div className="max-w-4xl mx-auto text-center mb-16">
         <h2
           id="client-reviews-heading"
-          className="text-[26px] md:text-4xl font-Play font-semibold text-[#1c1c1c]"
+          className="text-[28px] md:text-4xl font-semibold text-[#1C1C1C]"
         >
           What Our Clients Say
         </h2>
-        <p className="font-Int text-base sm:text-lg mt-3 text-zinc-600">
-          What our clients say after trusting us with their vision.
+        <p className="text-base sm:text-lg mt-3 text-gray-600">
+          Real feedback from partners who trust Movira on-site.
         </p>
+        <div className="w-20 h-0.5 bg-[#C2A356] mx-auto mt-6" />
       </div>
 
-      {/* Reviews Grid */}
-      <div className="relative z-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 justify-items-center font-Int max-w-7xl mx-auto">
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 justify-items-center max-w-7xl mx-auto">
         {reviews.map((review, index) => (
           <article
             key={index}
-            className="p-8 rounded-2xl border border-zinc-400 
-                       bg-white/90 backdrop-blur-sm 
-                       shadow-[0_4px_20px_rgba(0,0,0,0.08)] 
-                       hover:shadow-[0_8px_28px_rgba(194,163,86,0.25)] 
-                       hover:-translate-y-1 transition-all w-full sm:w-[90%] lg:w-[95%] max-w-md"
+            className="relative bg-white p-8 rounded-xl 
+                       border border-gray-200
+                       shadow-sm hover:shadow-xl
+                       transition-all duration-300
+                       hover:-translate-y-1
+                       w-full max-w-md"
             aria-label={`Client review by ${review.name}`}
           >
-            <p className="text-base leading-relaxed text-zinc-800">
+            <FaQuoteLeft className="text-[#C2A356] text-2xl mb-4 opacity-80" />
+
+            <p className="text-base leading-relaxed text-justify text-gray-700 mb-6">
               {review.message}
             </p>
-            <p
-              className="mt-5 text-sm font-semibold tracking-wide text-right text-[#C2A356]"
-              dangerouslySetInnerHTML={{ __html: `- ${review.name}` }}
-            />
+
+            <div className="border-t pt-4 border-gray-200">
+              <p className="text-sm font-semibold text-[#1C1C1C]">
+                {review.name}
+              </p>
+              <p className="text-sm text-gray-500">
+                {review.company}
+              </p>
+            </div>
           </article>
         ))}
       </div>

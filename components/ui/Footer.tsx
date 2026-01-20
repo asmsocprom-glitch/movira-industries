@@ -1,8 +1,16 @@
+"use client";
 import Image from "next/image";
-
+import { usePathname } from "next/navigation";
 const Footer = () => {
+  const pathname = usePathname();
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/supplier")
+  ) {
+    return null;
+  }
   return (
-    <footer id="footer" className="bg-[#1C1C1C] font-Int text-white px-6 py-6 ">
+    <footer id="footer" className="bg-[#1C1C1C] font-Manrope text-white px-6 py-6 ">
       <div className="flex flex-col justify-between items-center gap-6">
         {/* Left: Logo and Address */}
         <div className="space-y-1 max-w-sm">

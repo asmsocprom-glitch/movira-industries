@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
+import { Search, ShoppingCart } from "lucide-react";
 
 interface NavLink {
   label: string;
@@ -12,126 +13,173 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { label: "About Us", href: "/about" },
-  { label: "Shop All", href: "/products" },
+  { label: "About", href: "/about" },
+  { label: "Products", href: "/products" },
+  { label: "Contact", href: "#footer" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const { isSignedIn } = useUser();
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = useCallback(() => {
     setIsOpen(prev => !prev);
-    document.body.style.overflow = isOpen ? "auto" : "hidden";
+    document.body.style.overflow = !isOpen ? "hidden" : "auto";
   }, [isOpen]);
 
-  const closeMenu = useCallback(() => {
+  const closeMenu = () => {
     setIsOpen(false);
     document.body.style.overflow = "auto";
-  }, []);
-
-  const scrollToFooter = () => {
-    document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (pathname.startsWith("/supplier") || pathname.startsWith("/admin")) {
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/supplier")
+  ) {
     return null;
   }
 
   return (
-    <nav className="fixed top-0 left-0 w-full py-4 z-30 uppercase font-Play text-white bg-[#1C1C1C] shadow-lg">
-      <div className="flex items-center justify-between mx-5 md:mx-10 lg:mx-20 py-2">
-        {/* Logo */}
-        <Link href="/" className="flex items-center">
+    <nav className="fixed top-0 left-0 w-full font-Manrope  z-40 bg-[#1C1C1C] text-white shadow-lg">
+      <div className="flex items-center justify-between px-5 md:px-10 lg:px-12 h-20">
+
+        <Link href="/" className="flex items-center gap-3">
           <Image
             src="/logo2.png"
             alt="Movira Industries Logo"
-            width={100}
-            height={100}
+            width={48}
+            height={48}
             priority
-            className="h-12 p-1 w-auto object-contain"
           />
-          <span className="px-4 text-md lg:text-2xl">
-            Movira Industries
+          <span className="text-lg lg:text-2xl  font-semibold tracking-wide">
+            MOVIRA INDUSTRIES 
           </span>
         </Link>
-
-        {/* Desktop Nav */}
-        <ul className="hidden sm:flex space-x-10 lg:space-x-18 tracking-wider text-sm lg:text-md">
-          {navLinks.map(({ label, href }) => (
-            <li key={label} className="relative group">
-              <Link href={href} className="px-1">
-                {label}
-                <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-[#C2A356] transition-all duration-300 group-hover:w-full" />
+        <div className="hidden md:flex flex-1 mx-10 max-w-xl">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full pl-12 pr-4 py-2.5 rounded-md bg-[#2A2A2A] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#C2A356]"
+            />
+          </div>
+        </div>
+        <ul className="hidden md:flex items-center gap-8 uppercase text-sm tracking-wider">
+          {navLinks.map(link => (
+            <li key={link.label} className="relative">
+              <Link href={link.href} className="pb-1">
+                {link.label}
+                {isActive(link.href) && (
+                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-[#C2A356]" />
+                )}
               </Link>
             </li>
           ))}
 
-          <button onClick={scrollToFooter}>Contact Us</button>
-
           <Link href="/cart">
-            <svg
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <ShoppingCart className="w-6 h-6" />
           </Link>
 
           {isSignedIn ? (
-            <Link href="/auth/redirect">PROFILE</Link>
+            <Link href="/auth/redirect">Profile</Link>
           ) : (
-            <Link href="/sign-in">SIGN IN</Link>
+            <Link href="/sign-in">Sign In</Link>
           )}
         </ul>
 
-        {/* Mobile Menu Button */}
         <button
-          className="md:hidden z-50 flex flex-col justify-center items-center w-10 h-10 space-y-1"
+          className="md:hidden flex flex-col space-y-1"
           onClick={toggleMenu}
         >
-          <span className={`h-0.5 w-6 bg-white transition ${isOpen ? "rotate-45 translate-y-1.5" : ""}`} />
-          <span className={`h-0.5 w-6 bg-white ${isOpen ? "opacity-0" : ""}`} />
-          <span className={`h-0.5 w-6 bg-white transition ${isOpen ? "-rotate-45 -translate-y-1.5" : ""}`} />
+          <span className={`h-0.5 w-6 bg-white transition ${isOpen && "rotate-45 translate-y-1.5"}`} />
+          <span className={`h-0.5 w-6 bg-white ${isOpen && "opacity-0"}`} />
+          <span className={`h-0.5 w-6 bg-white transition ${isOpen && "-rotate-45 -translate-y-1.5"}`} />
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      <div className="md:hidden px-5 pb-4">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full pl-12 pr-4 py-3 rounded-md bg-[#2A2A2A] border border-gray-700"
+          />
+        </div>
+      </div>
       <div
-        className={`fixed top-0 right-0 h-full w-full bg-[#1C1C1C] z-50 transform transition-transform md:hidden ${
+        className={`fixed inset-0 bg-[#121212] z-50 transform transition-transform duration-300 md:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex justify-between items-center p-4 border-b border-gray-500">
-          <span className="text-xl">Menu</span>
-          <button onClick={closeMenu}>✕</button>
-        </div>
+        <button
+          onClick={closeMenu}
+          aria-label="Close menu"
+          className="absolute top-6 right-6 text-white text-3xl"
+        >
+          ✕
+        </button>
 
-        <ul className="flex flex-col p-6 space-y-6">
-          {navLinks.map(({ label, href }) => (
-            <li key={label}>
-              <Link href={href} onClick={closeMenu}>
-                {label}
-              </Link>
-            </li>
+        {/* Menu Links */}
+        <nav className="flex flex-col justify-center pl-8 h-full gap-6 text-white uppercase text-lg tracking-wider">
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              onClick={closeMenu}
+              className={`relative pb-1 transition-colors ${
+                isActive(link.href)
+                  ? "text-[#C2A356] after:w-full"
+                  : "after:w-0"
+              } after:absolute after:left-0 after:bottom-0  after:bg-[#C2A356] after:transition-all`}
+            >
+              {link.label}
+            </Link>
           ))}
 
+          <Link
+            href="/cart"
+            onClick={closeMenu}
+            className={`relative pb-1 ${
+              isActive("/cart") ? "text-[#C2A356] after:w-full" : "after:w-0"
+            } after:absolute after:left-0 after:bottom-0 after:h-0.5 after:bg-[#C2A356] after:transition-all`}
+          >
+            Cart
+          </Link>
+
           {isSignedIn ? (
-            <Link href="/auth/redirect" onClick={closeMenu}>
-              PROFILE
+            <Link
+              href="/auth/redirect"
+              onClick={closeMenu}
+              className={`relative pb-1 ${
+                isActive("/auth/redirect")
+                  ? "text-[#C2A356] after:w-full"
+                  : "after:w-0"
+              } after:absolute after:left-0 after:bottom-0 after:h-0.5 after:bg-[#C2A356] after:transition-all`}
+            >
+              Profile
             </Link>
           ) : (
-            <Link href="/sign-in" onClick={closeMenu}>
-              SIGN IN
+            <Link
+              href="/sign-up"
+              onClick={closeMenu}
+              className={`relative pb-1 ${
+                isActive("/sign-up")
+                  ? "text-[#C2A356] after:w-full"
+                  : "after:w-0"
+              } after:absolute after:left-0 after:bottom-0 after:h-0.5 after:bg-[#C2A356] after:transition-all`}
+            >
+              Sign Up
             </Link>
           )}
-        </ul>
+        </nav>
       </div>
     </nav>
   );

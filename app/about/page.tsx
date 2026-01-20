@@ -1,112 +1,124 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import TopSection from "@/components/ui/TopSection";
 
 const About = () => {
   return (
-    <main className="leading-relaxed text-[#1C1C1C] font-Int">
-      {/* Hero */}
-      <TopSection title="About Us" />
+    <main className="font-Manrope bg-[#f7f6f2] text-[#1C1C1C]">
 
-      {/* About Company */}
-      <section className="flex flex-col lg:flex-row items-center justify-center gap-12 px-4 sm:px-8 md:px-16 lg:px-40 py-20">
-        {/* Image / Illustration */}
-        <div className="w-full lg:w-[40%] max-w-md relative group">
-          <Image
-            src="https://images.unsplash.com/photo-1616320999187-3c004dad4f0b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387"
-            alt="Movira Industries Infrastructure"
-            width={387}
-            height={580}
-            className="w-full h-auto object-cover shadow-2xl border-4 border-white rounded-md relative z-10"
-          />
-
-        </div>
-
-        {/* Text */}
-        <div className="w-full lg:w-[60%] bg-[#EAE7DC] p-8 md:p-12 shadow-lg hover:shadow-2xl rounded-2xl border border-[#d6d3c9] transition duration-300">
-          <h2 className="text-3xl sm:text-4xl font-semibold font-Play uppercase mb-4 tracking-wide">
-            Movira Industries LLP
-          </h2>
-          <p className="uppercase text-sm text-gray-600 font-Int mb-8 tracking-[0.15em]">
-            Built with Trust.
+      <section className="px-4 sm:px-8 md:px-16 lg:px-40 pt-20 pb-16">
+        <div className="max-w-5xl">
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight">
+            About Movira Industries
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg text-gray-700 leading-relaxed">
+            Delivering safe, reliable scaffolding and formwork solutions for
+            India’s growing construction and infrastructure needs.
           </p>
+        </div>
+      </section>
 
-          <div className="space-y-6 text-base text-justify font-Int text-gray-800 leading-relaxed">
-            <p>
-              Movira Industries LLP is a premier provider of scaffolding and formwork
-              solutions, powering India’s construction and infrastructure growth.
-              We deliver high-quality, reliable, and safe equipment that caters to
-              contractors, builders, and large-scale infrastructure developers.
-            </p>
-
-            <p>
-              With a comprehensive range of rental and supply options including
-              cuplock systems, adjustable props, mild steel accessories, and custom
-              structural components we offer end-to-end solutions that enhance site
-              efficiency and ensure worker safety. Every product is rigorously inspected, maintained, and ready for
-              deployment, ensuring projects are executed with confidence, on time,
-              and within budget.
-            </p>
-
-            <p>
-              Backed by technical expertise, customer-first service, and a passion
-              for quality, Movira Industries continues to strengthen its presence as
-              a trusted partner in India’s construction ecosystem building stronger,
-              safer, and smarter infrastructure for the future.
-            </p>
+      <section className="px-4 sm:px-8 md:px-16 lg:px-40 pb-24">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 items-stretch">
+          <div className="lg:col-span-5 flex">
+            <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src="https://images.unsplash.com/photo-1616320999187-3c004dad4f0b?auto=format&fit=crop&q=80&w=900"
+                alt="Movira Industries Infrastructure"
+                fill
+                priority
+                className="object-cover relative z-10"
+              />
+            </div>
           </div>
 
-          {/* Contact Details */}
-          <div className="mt-10 space-y-3 text-sm text-[#333] font-Int">
-            <p>
-              <strong>Address:</strong> 105 Commerce House, Kala Ghoda, Fort,
-              Mumbai - 400001
-            </p>
-            <p>
-              <strong>Phone:</strong>{" "}
-              <a
-                href="tel:+918291527207"
-                className="text-[#1C1C1C] hover:underline"
-              >
-                +91 82915 27207
-              </a>
-            </p>
-            <p>
-              <strong>Email:</strong>{" "}
-              <a
-                href="mailto:info@moviraindustries.in"
-                className="text-[#1C1C1C] hover:underline"
-              >
-                info@moviraindustries.in
-              </a>
-            </p>
-            <p>
-              <strong>Instagram:</strong>{" "}
-              <a
-                href="https://www.instagram.com/moviraindustries/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#1C1C1C] hover:underline"
-              >
-                @moviraindustries
-              </a>
-            </p>
+          <div className="lg:col-span-7 space-y-8 flex flex-col">
+            <div className="bg-white border border-[#e6e6e6] rounded-2xl p-8 md:p-10 shadow-lg">
+              <h2 className="text-3xl font-semibold">
+                Movira Industries LLP
+              </h2>
+              <p className="mt-2 text-sm uppercase tracking-[0.3em] text-[#C2A356]">
+                Built with Trust
+              </p>
+
+              <p className="mt-6 text-gray-800 leading-relaxed">
+                Movira Industries LLP is a trusted provider of scaffolding and
+                formwork systems, supporting contractors, builders, and
+                infrastructure developers across India with safe and dependable
+                equipment.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="bg-white border border-[#e6e6e6] rounded-xl p-6 shadow-md">
+                <h3 className="font-semibold text-lg mb-2">
+                  What We Provide
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  Cuplock systems, adjustable props, mild steel accessories,
+                  centering materials, and custom formwork solutions — all
+                  inspected and site-ready.
+                </p>
+              </div>
+              <div className="bg-white border border-[#e6e6e6] rounded-xl p-6 shadow-md">
+                <h3 className="font-semibold text-lg mb-2">
+                  Why Choose Us
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  We focus on quality, timely delivery, and long-term
+                  partnerships — ensuring your projects stay safe, efficient,
+                  and on schedule.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-[#e6e6e6] rounded-xl p-6 shadow-md mt-auto">
+              <h3 className="font-semibold text-lg mb-4">
+                Get in Touch
+              </h3>
+
+              <div className="space-y-2 text-sm text-gray-800">
+                <p>
+                  <span className="font-medium">Address:</span>{" "}
+                  105 Commerce House, Kala Ghoda, Fort, Mumbai – 400001
+                </p>
+                <p>
+                  <span className="font-medium">Phone:</span>{" "}
+                  <a href="tel:+918291527207" className="hover:text-[#C2A356]">
+                    +91 82915 27207
+                  </a>
+                </p>
+                <p>
+                  <span className="font-medium">Email:</span>{" "}
+                  <a
+                    href="mailto:info@moviraindustries.in"
+                    className="hover:text-[#C2A356]"
+                  >
+                    info@moviraindustries.in
+                  </a>
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Embedded Google Map */}
-      <div className="w-full h-[50vh] md:h-[80vh] relative px-4 sm:px-8 pb-16">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.667899030902!2d72.83241817494015!3d18.9392794822451!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce3b55b803a9%3A0x94e2e03de508a4b!2sCommerce%20House%2C%20Kala%20Ghoda%2C%20Fort%2C%20Mumbai%2C%20Maharashtra%20400001!5e0!3m2!1sen!2sin!4v1730805000000!5m2!1sen!2sin"
-          className="w-full h-full border-0 rounded-md"
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Movira Industries Location"
-        />
-      </div>
+      {/* MAP SECTION */}
+      <section className="px-4 sm:px-8 md:px-16 lg:px-40 pb-24">
+        <div className="max-w-7xl mx-auto">
+          <h3 className="text-2xl font-semibold mb-6">
+            Our Location
+          </h3>
+
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.667899030902!2d72.83241817494015!3d18.9392794822451!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce3b55b803a9%3A0x94e2e03de508a4b!2sCommerce%20House%2C%20Kala%20Ghoda%2C%20Fort%2C%20Mumbai%2C%20Maharashtra%20400001!5e0!3m2!1sen!2sin!4v1730805000000!5m2!1sen!2sin"
+            className="w-full h-[60vh] rounded-2xl border border-[#e5e5e5] shadow-lg"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
     </main>
   );
 };

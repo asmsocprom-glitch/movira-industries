@@ -13,6 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import Link from "next/link";
 
 interface CartItem {
   productId: string;
@@ -75,7 +76,6 @@ export default function CartPage() {
       });
 
       alert("Request sent successfully");
-
       localStorage.removeItem("cartItems");
       setCartItems([]);
     } catch (err) {
@@ -88,56 +88,85 @@ export default function CartPage() {
 
   if (!cartItems.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Your cart is empty
+      <div className="min-h-screen flex flex-col items-center font-Manrope justify-center bg-[#f7f6f2] text-center px-4">
+        <h2 className="text-2xl font-semibold mb-3">
+          Your cart is empty
+        </h2>
+        <p className="text-gray-600 mb-6 max-w-md">
+          Looks like you haven’t added any products yet. Explore our collection
+          to get started.
+        </p>
+
+        <Link
+          href="/products"
+          className="px-6 py-3 text-sm font-semibold border border-[#1C1C1C]
+                     hover:bg-[#1C1C1C] hover:text-white transition"
+        >
+          Shop Products
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8] px-4 md:px-10 lg:px-20 py-10">
-      <h1 className="text-2xl font-semibold mb-6">Cart</h1>
+    <div className="min-h-screen bg-[#f7f6f2] px-4 md:px-10 lg:px-32 py-8 font-Manrope">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-semibold pt-10 mb-8">Your Cart</h1>
+        <div className="space-y-5">
+          {cartItems.map((item) => (
+            <div
+              key={item.productId}
+              className="bg-white rounded-2xl border border-[#e6e6e6] p-5 flex gap-5"
+            >
+              <div className="relative w-40 h-40 rounded-lg overflow-hidden border">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {cartItems.map((item) => (
-          <div
-            key={item.productId}
-            className="bg-white border rounded-lg p-4 flex gap-4"
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">{item.title}</h3>
+                <p className="text-sm text-gray-600">{item.category}</p>
+
+                <div className="mt-2 text-sm space-y-1">
+                  <p><span className="font-medium">Variant:</span> {item.variant}</p>
+                  <p><span className="font-medium">Spec:</span> {item.specification}</p>
+                  <p><span className="font-medium">Qty:</span> {item.quantity}</p>
+                </div>
+
+                <button
+                  onClick={() => removeItem(item.productId)}
+                  className="mt-4 text-sm text-red-600 hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 flex flex-wrap gap-4">
+          <button
+            onClick={handleOrder}
+            disabled={loading}
+            className="px-8 py-3 bg-[#1C1C1C] text-white text-sm font-semibold
+                       hover:opacity-90 transition disabled:opacity-50"
           >
-            <div className="relative w-24 h-24 border rounded overflow-hidden">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover"
-              />
-            </div>
+            {loading ? "Placing Order..." : "Place Order"}
+          </button>
 
-            <div className="flex-1">
-              <h3 className="font-semibold">{item.title}</h3>
-              <p className="text-sm text-gray-600">{item.category}</p>
-              <p className="text-sm">Variant: {item.variant}</p>
-              <p className="text-sm">Spec: {item.specification}</p>
-              <p className="text-sm">Qty: {item.quantity}</p>
+          <Link
+            href="/products"
+            className="px-8 py-3 border border-gray-400 text-sm font-semibold
+                       hover:border-black transition"
+          >
+            Continue Shopping
+          </Link>
+        </div>
 
-              <button
-                onClick={() => removeItem(item.productId)}
-                className="mt-3 text-sm text-red-600"
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        ))}
       </div>
-
-      <button
-        onClick={handleOrder}
-        className="mt-8 px-6 py-3 bg-black text-white rounded"
-        disabled={loading}
-      >
-        {loading ? "Placing Order..." : "Place Order"}
-      </button>
     </div>
   );
 }

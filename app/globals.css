@@ -1,7 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -9,22 +7,13 @@
 
 @theme {
 
-  --font-Play: "Playfair Display", serif;
-
-  --font-Int: "Instrument Sans", sans-serif;
+    --font-Manrope: "Manrope", sans-serif;
 }
 
  body{
   background:#fffefc ;
 
 } 
-  /* .custom-arrows .splide__arrow--prev {
-    left: -2.5rem !important; 
-  }
-
-  .custom-arrows .splide__arrow--next {
-    right: -2.5rem !important;
-  } */ 
 
   @theme inline {
 
