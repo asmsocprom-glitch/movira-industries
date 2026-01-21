@@ -76,14 +76,10 @@ export default function SupplierDashboard() {
         ...(d.data() as Omit<Quotation, "id">),
       }));
 
-      const visibleQuotations = allQuotations.filter(
-        (q) => q.status !== "rejected"
-      );
+      setQuotations(allQuotations.filter((q) => q.status !== "rejected"));
 
-      setQuotations(visibleQuotations);
-
-      const quotedRequestIds = new Set(
-        visibleQuotations.map((q) => q.supplierRequestId)
+      const handledRequestIds = new Set(
+        allQuotations.map((q) => q.supplierRequestId)
       );
 
       const requestSnap = await getDocs(collection(db, "supplierRequests"));
@@ -92,7 +88,7 @@ export default function SupplierDashboard() {
 
       for (const d of requestSnap.docs) {
         const data = d.data();
-        if (quotedRequestIds.has(d.id)) continue;
+        if (handledRequestIds.has(d.id)) continue;
 
         reqList.push({
           id: d.id,
@@ -106,7 +102,7 @@ export default function SupplierDashboard() {
         }
       }
 
-      for (const q of visibleQuotations) {
+      for (const q of allQuotations) {
         if (!clientCache[q.clientId]) {
           const cSnap = await getDoc(doc(db, "clients", q.clientId));
           if (cSnap.exists()) clientCache[q.clientId] = cSnap.data() as Client;
@@ -126,15 +122,11 @@ export default function SupplierDashboard() {
       .filter((p) => prices[`${req.id}_${p.productId}`])
       .map((p) => {
         const price = Number(prices[`${req.id}_${p.productId}`]);
-        return {
-          ...p,
-          price,
-          totalPrice: price * p.quantity,
-        };
+        return { ...p, price, totalPrice: price * p.quantity };
       });
 
     if (!selectedProducts.length) {
-      alert("Please enter at least one price before submitting.");
+      alert("Please enter at least one price");
       return;
     }
 
@@ -147,8 +139,7 @@ export default function SupplierDashboard() {
       createdAt: serverTimestamp(),
     });
 
-    alert("Quotation submitted successfully");
-    window.location.reload();
+    setRequests((prev) => prev.filter((r) => r.id !== req.id));
   };
 
   const rejectRequest = async (req: SupplierRequest) => {
@@ -163,117 +154,159 @@ export default function SupplierDashboard() {
       createdAt: serverTimestamp(),
     });
 
-    alert("Request rejected");
     setRequests((prev) => prev.filter((r) => r.id !== req.id));
-  };
+  }
 
-  if (loading) return <p className="p-6 min-h-screen">Loading...</p>;
+  if (loading) return <p className="p-8 min-h-screen bg-[#f7f6f2] font-Manrope">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between mb-8">
-          <h1 className="text-2xl font-semibold">Supplier Dashboard</h1>
+    <div className="min-h-screen bg-[#f7f6f2] font-Manrope  py-10">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex justify-between items-center mb-10">
+          <div>
+            <h1 className="text-3xl font-bold">Supplier Dashboard</h1>
+          </div>
           <SignOutButton>
-            <button className="bg-black text-white px-4 py-2 rounded">
-              Sign Out
+            <button className="px-4 py-2 text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition">
+              Logout
             </button>
           </SignOutButton>
         </div>
 
         <h2 className="text-xl font-semibold mb-4">Pending Requests</h2>
-        {requests.length === 0 && <p className="text-gray-500">No pending requests</p>}
 
-        {requests.map((req) => {
-          const client = clients[req.clientId];
-          return (
-            <div key={req.id} className="bg-white p-6 rounded mb-6 shadow">
-              <p className="font-medium mb-3">
-                {client?.name} — {client?.address}
-              </p>
+        {requests.length === 0 && (
+          <p className="text-gray-500 mb-10">No pending requests</p>
+        )}
 
-              {req.products.map((p) => {
-                const price = Number(prices[`${req.id}_${p.productId}`] || 0);
-                const total = price * p.quantity;
+        <div className="space-y-8">
+          {requests.map((req) => {
+            const client = clients[req.clientId];
+            return (
+              <div
+                key={req.id}
+                className="bg-white rounded-2xl shadow-sm border p-6"
+              >
+                <div className="mb-5">
+                  <p className="font-semibold">
+                    {client?.name}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {client?.address}
+                  </p>
+                </div>
 
-                return (
-                  <div key={p.productId} className="flex gap-4 mb-3 items-center">
-                    <div className="relative w-16 h-16">
-                      <Image src={p.image} alt={p.title} fill className="object-contain" />
-                    </div>
-                    <div className="flex-1">
-                      <p>{p.title}</p>
-                      <p className="text-sm">
-                        {p.variant} | Qty: {p.quantity}
-                      </p>
-                      {price > 0 && (
-                        <p className="text-sm font-medium">
-                          Total: ₹ {total}
-                        </p>
-                      )}
-                    </div>
-                    <input
-                      type="number"
-                      placeholder="Price per piece"
-                      className="border px-3 py-2 w-36 rounded"
-                      value={prices[`${req.id}_${p.productId}`] || ""}
-                      onChange={(e) =>
-                        setPrices((prev) => ({
-                          ...prev,
-                          [`${req.id}_${p.productId}`]: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                );
-              })}
+                <div className="space-y-4">
+                  {req.products.map((p) => {
+                    const price = Number(prices[`${req.id}_${p.productId}`] || 0);
+                    const total = price * p.quantity;
 
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={() => submitQuotation(req)}
-                  className="bg-green-600 text-white px-5 py-2 rounded"
-                >
-                  Submit Quotation
-                </button>
-                <button
-                  onClick={() => rejectRequest(req)}
-                  className="bg-red-600 text-white px-5 py-2 rounded"
-                >
-                  Reject
-                </button>
+                    return (
+                      <div
+                        key={p.productId}
+                        className="flex items-center gap-4 p-4 border rounded-xl"
+                      >
+                        <div className="relative w-16 h-16 shrink-0">
+                          <Image
+                            src={p.image}
+                            alt={p.title}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <p className="font-medium">{p.title}</p>
+                          <p className="text-sm text-gray-500">
+                            {p.variant} • Qty {p.quantity}
+                          </p>
+                          {price > 0 && (
+                            <p className="text-sm font-semibold mt-1">
+                              Total ₹ {total}
+                            </p>
+                          )}
+                        </div>
+
+                        <input
+                          type="number"
+                          placeholder="Price"
+                          className="w-32 border rounded-lg px-3 py-2 text-sm"
+                          value={prices[`${req.id}_${p.productId}`] || ""}
+                          onChange={(e) =>
+                            setPrices((prev) => ({
+                              ...prev,
+                              [`${req.id}_${p.productId}`]: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex gap-4 mt-6">
+                  <button
+                    onClick={() => submitQuotation(req)}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg"
+                  >
+                    Submit Quotation
+                  </button>
+                  <button
+                    onClick={() => rejectRequest(req)}
+                    className="bg-red-600 text-white px-6 py-2 rounded-lg"
+                  >
+                    Reject
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <h2 className="text-xl font-semibold mt-14 mb-4">My Quotations</h2>
 
-        <h2 className="text-xl font-semibold mt-12 mb-4">My Quotations</h2>
-        {quotations.length === 0 && <p className="text-gray-500">No quotations</p>}
+        {quotations.length === 0 && (
+          <p className="text-gray-500">No quotations</p>
+        )}
 
-        {quotations.map((q) => {
-          const client = clients[q.clientId];
-          return (
-            <div key={q.id} className="bg-white p-6 rounded mb-6 border">
-              <p className="font-medium mb-1">
-                {client?.name} — {client?.address}
-              </p>
-
-              {q.products.map((p) => (
-                <div key={p.productId} className="flex justify-between text-sm mb-1">
-                  <span>
-                    {p.title} × {p.quantity}
-                  </span>
-                  <span>
-                    ₹ {p.price} | Total ₹ {p.totalPrice}
-                  </span>
-                  <span>
+        <div className="space-y-6">
+          {quotations.map((q) => {
+            const client = clients[q.clientId];
+            return (
+              <div
+                key={q.id}
+                className="bg-white rounded-2xl border p-6"
+              >
+                <div className="flex justify-between mb-4">
+                  <div>
+                    <p className="font-semibold">{client?.name}</p>
+                    <p className="text-sm text-gray-500">
+                      {client?.address}
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 text-sm rounded-lg bg-yellow-100 text-yellow-700 capitalize">
                     {q.status}
                   </span>
                 </div>
-                
-              ))}
-            </div>
-          );
-        })}
+
+                <div className="space-y-2 text-sm">
+                  {q.products.map((p) => (
+                    <div
+                      key={p.productId}
+                      className="flex justify-between border-b pb-1"
+                    >
+                      <span>
+                        {p.title} × {p.quantity}
+                      </span>
+                      <span>
+                        ₹ {p.price} → ₹ {p.totalPrice}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

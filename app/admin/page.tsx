@@ -44,8 +44,6 @@ interface Quotation {
 interface Client {
   name: string;
   address?: string;
-  email?: string;
-  phone?: string;
 }
 
 export default function AdminDashboard() {
@@ -56,8 +54,8 @@ export default function AdminDashboard() {
   const [quotations, setQuotations] = useState<Record<string, Quotation[]>>({});
   const [modalRequest, setModalRequest] = useState<SupplierRequest | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
-  const [marginMap, setMarginMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [marginMap, setMarginMap] = useState<Record<string, Record<string, string>>>({});
 
   useEffect(() => {
     const load = async () => {
@@ -65,15 +63,12 @@ export default function AdminDashboard() {
 
       const clientReqSnap = await getDocs(collection(db, "clientRequests"));
       setPendingCount(
-        clientReqSnap.docs.filter((d) => d.data().status === "pending").length
+        clientReqSnap.docs.filter(d => d.data().status === "pending").length
       );
 
-      const srQuery = query(
-        collection(db, "supplierRequests"),
-        where("status", "!=", "accepted")
+      const srSnap = await getDocs(
+        query(collection(db, "supplierRequests"), where("status", "!=", "accepted"))
       );
-
-      const srSnap = await getDocs(srQuery);
 
       const srList: SupplierRequest[] = [];
       const clientCache: Record<string, Client> = {};
@@ -97,7 +92,7 @@ export default function AdminDashboard() {
       const qSnap = await getDocs(collection(db, "quotations"));
       const qMap: Record<string, Quotation[]> = {};
 
-      qSnap.docs.forEach((d) => {
+      qSnap.docs.forEach(d => {
         const q = { id: d.id, ...(d.data() as Omit<Quotation, "id">) };
         if (q.status !== "under_review") return;
         if (!qMap[q.supplierRequestId]) qMap[q.supplierRequestId] = [];
@@ -114,15 +109,11 @@ export default function AdminDashboard() {
   }, []);
 
   const acceptQuotation = async (q: Quotation) => {
-    const marginValue = marginMap[q.id];
-    if (!marginValue) {
-      alert("Please enter margin before accepting");
-      return;
-    }
+    const margins = marginMap[q.id];
+    if (!margins) return alert("Enter margin for each product");
 
-    const margin = Number(marginValue);
-
-    const productsWithMargin = q.products.map((p) => {
+    const productsWithMargin = q.products.map(p => {
+      const margin = Number(margins[p.productId] || 0);
       const baseTotal = (p.price || 0) * p.quantity;
       return {
         ...p,
@@ -142,143 +133,159 @@ export default function AdminDashboard() {
 
     await updateDoc(doc(db, "quotations", q.id), { status: "accepted" });
 
-    const related = quotations[q.supplierRequestId] || [];
-    for (const other of related) {
+    for (const other of quotations[q.supplierRequestId] || []) {
       if (other.id !== q.id) {
         await updateDoc(doc(db, "quotations", other.id), { status: "lost" });
       }
     }
 
-    await updateDoc(
-      doc(db, "supplierRequests", q.supplierRequestId),
-      { status: "accepted" }
-    );
-
-
-    setRequests((prev) =>
-      prev.filter((r) => r.id !== q.supplierRequestId)
-    );
-
-    setQuotations((prev) => {
-      const copy = { ...prev };
-      delete copy[q.supplierRequestId];
-      return copy;
+    await updateDoc(doc(db, "supplierRequests", q.supplierRequestId), {
+      status: "accepted",
     });
+
+    setRequests(prev => prev.filter(r => r.id !== q.supplierRequestId));
   };
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f7f6f2] font-Manrope ">
+        Loading dashboard...
+      </div>
+    );
+  }
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <div className="flex justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
+    <div className="min-h-screen bg-[#f7f6f2] font-Manrope px-6 py-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex flex-wrap justify-between items-center gap-4">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => router.push("/admin/requests")}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Requests ({pendingCount})
-          </button>
-
-          <button
-            onClick={() => router.push("/admin/final-orders")}
-            className="bg-green-600 text-white px-4 py-2 rounded"
-          >
-            Final Orders
-          </button>
-
-          <SignOutButton>
-            <button className="bg-red-600 text-white px-4 py-2 rounded">
-              Sign Out
+          <div className="flex gap-3">
+            <button
+              onClick={() => router.push("/admin/requests")}
+              className="px-4 py-2 bg-white border rounded-lg text-sm"
+            >
+              Requests <span className="text-blue-600">({pendingCount})</span>
             </button>
-          </SignOutButton>
+
+            <button
+              onClick={() => router.push("/admin/final-orders")}
+              className="px-4 py-2 bg-white border rounded-lg text-sm"
+            >
+              Final Orders
+            </button>
+
+            <SignOutButton>
+              <button className="px-4 py-2 text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition">
+              Logout
+            </button>
+            </SignOutButton>
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {requests.map(req => {
+            const client = clients[req.clientId];
+            const qs = quotations[req.id] || [];
+
+            return (
+              <div key={req.id} className="bg-white rounded-2xl border p-5 shadow-sm">
+                <div className="mb-3">
+                  <h3 className="font-semibold">{client?.name}</h3>
+                  <p className="text-sm text-gray-500">{client?.address}</p>
+                </div>
+
+                <button
+                  onClick={() => setModalRequest(req)}
+                  className="text-sm text-blue-600 underline"
+                >
+                  View request details
+                </button>
+
+                <div className="mt-4 space-y-4">
+                  {qs.map(q => (
+                    <div key={q.id} className="bg-gray-50 rounded-xl p-4 border">
+                      <p className="font-medium text-sm mb-3">
+                        {q.supplierEmail}
+                      </p>
+
+                      <div className="space-y-3">
+                        {q.products.map(p => (
+                          <div
+                            key={p.productId}
+                            className="flex justify-between items-center gap-3"
+                          >
+                            <div className="text-sm">
+                              <p className="font-medium">{p.title}</p>
+                              <p className="text-gray-500">
+                                ₹{p.price} × {p.quantity}
+                              </p>
+                            </div>
+
+                            <input
+                              type="number"
+                              placeholder="Margin"
+                              className="w-24 border rounded px-2 py-1 text-sm"
+                              value={marginMap[q.id]?.[p.productId] || ""}
+                              onChange={e =>
+                                setMarginMap(prev => ({
+                                  ...prev,
+                                  [q.id]: {
+                                    ...(prev[q.id] || {}),
+                                    [p.productId]: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => acceptQuotation(q)}
+                        className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg text-sm"
+                      >
+                        Accept Quotation
+                      </button>
+                    </div>
+                  ))}
+
+                  {qs.length === 0 && (
+                    <p className="text-sm text-gray-500">
+                      No quotations yet
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {requests.map((req) => {
-          const client = clients[req.clientId];
-          const qs = quotations[req.id] || [];
-
-          return (
-            <div key={req.id} className="bg-white p-4 rounded shadow">
-              <h3 className="font-medium">{client?.name}</h3>
-              <p className="text-sm text-gray-600">{client?.address}</p>
-
-              <button
-                onClick={() => setModalRequest(req)}
-                className="text-blue-600 text-sm mt-2"
-              >
-                View Request Details
-              </button>
-
-              <div className="mt-3 space-y-3">
-                {qs.map((q) => (
-                  <div key={q.id} className="border p-3 rounded">
-                    <p className="font-medium">{q.supplierEmail}</p>
-
-                    {q.products.map((p) => (
-                      <p key={p.productId} className="text-sm">
-                        {p.title}: ₹{p.price} × {p.quantity}
-                      </p>
-                    ))}
-
-                    <input
-                      type="number"
-                      placeholder="Margin"
-                      className="border px-2 py-1 w-full mt-2 rounded"
-                      value={marginMap[q.id] || ""}
-                      onChange={(e) =>
-                        setMarginMap((prev) => ({
-                          ...prev,
-                          [q.id]: e.target.value,
-                        }))
-                      }
-                    />
-
-                    <button
-                      onClick={() => acceptQuotation(q)}
-                      className="mt-2 bg-green-600 text-white px-3 py-1 rounded w-full"
-                    >
-                      Accept Quotation
-                    </button>
-                  </div>
-                ))}
-
-                {qs.length === 0 && (
-                  <p className="text-sm text-gray-500">No quotations yet</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       {modalRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded w-full max-w-lg relative">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 relative">
             <button
               onClick={() => setModalRequest(null)}
-              className="absolute top-2 right-3 text-lg"
+              className="absolute top-4 right-4 text-xl"
             >
               ✕
             </button>
 
-            <h2 className="text-xl font-semibold mb-3">
+            <h2 className="text-xl font-semibold mb-4">
               {clients[modalRequest.clientId]?.name}
             </h2>
 
-            <ul className="space-y-2">
-              {modalRequest.products.map((p) => (
-                <li key={p.productId} className="border p-2 rounded">
+            <div className="space-y-3">
+              {modalRequest.products.map(p => (
+                <div key={p.productId} className="border rounded-lg p-3">
                   <p className="font-medium">{p.title}</p>
-                  <p>Qty: {p.quantity}</p>
-                  {p.variant && <p>Variant: {p.variant}</p>}
-                  {p.specification && <p>Spec: {p.specification}</p>}
-                </li>
+                  <p className="text-sm">Qty: {p.quantity}</p>
+                  {p.variant && <p className="text-sm">Variant: {p.variant}</p>}
+                  {p.specification && (
+                    <p className="text-sm">Spec: {p.specification}</p>
+                  )}
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       )}

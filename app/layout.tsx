@@ -45,7 +45,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
         >
           <Navbar />
-          <main className="flex-1 pt-20 bg-gray-50">
+          <main className="flex-1 pt-20 bg-[#f7f6f2]">
             {children}
           </main>
           <Footer />
