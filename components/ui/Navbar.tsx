@@ -1,15 +1,21 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useCallback, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { Search, ShoppingCart } from "lucide-react";
+import productsData from "@/app/lib/product.json";
 
 interface NavLink {
   label: string;
   href: string;
+}
+interface SearchItem {
+  id: string;
+  slug: string;
+  title: string;
 }
 
 const navLinks: NavLink[] = [
@@ -20,8 +26,12 @@ const navLinks: NavLink[] = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isSignedIn } = useUser();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<SearchItem[]>([]);
 
   const toggleMenu = useCallback(() => {
     setIsOpen(prev => !prev);
@@ -36,7 +46,23 @@ export default function Navbar() {
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
-  };
+  }
+   useEffect(() => {
+    if (!search.trim()) {
+      setResults([])
+      return
+    }
+    const filtered = productsData.filter((p) =>
+      p.title.toLowerCase().includes(search.toLowerCase())
+    )
+    setResults(
+      filtered.map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+      }))
+    )
+  }, [search])
 
   if (
     pathname.startsWith("/admin") ||
@@ -65,10 +91,28 @@ export default function Navbar() {
           <div className="relative w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
-              type="text"
-              placeholder="Search products..."
-              className="w-full pl-12 pr-4 py-2.5 rounded-md bg-[#2A2A2A] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#C2A356]"
-            />
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            type="text"
+            placeholder="Search products..."
+            className="w-full pl-12 pr-4 py-2.5 rounded-md bg-[#2A2A2A] border border-gray-700"
+          />
+          {results.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-[#2A2A2A] border border-gray-700 rounded-md overflow-hidden z-50">
+              {results.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    router.push(`/products/${item.slug}`);
+                    setSearch("");
+                    setResults([]);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A3A] border-b border-gray-700">
+                    <span className="text-sm font-medium ">{item.title}</span>
+                </button>
+              ))}
+            </div>
+          )}
           </div>
         </div>
         <ul className="hidden md:flex items-center gap-8 uppercase text-sm tracking-wider">
@@ -109,9 +153,27 @@ export default function Navbar() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
             className="w-full pl-12 pr-4 py-3 rounded-md bg-[#2A2A2A] border border-gray-700"
           />
+          {results.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-[#2A2A2A] border border-gray-700 rounded-md overflow-hidden z-50">
+              {results.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    router.push(`/products/${item.slug}`);
+                    setSearch("");
+                    setResults([]);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A3A] border-b border-gray-700">
+                    <span className="text-sm font-medium ">{item.title}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div
@@ -126,8 +188,6 @@ export default function Navbar() {
         >
           ✕
         </button>
-
-        {/* Menu Links */}
         <nav className="flex flex-col justify-center pl-8 h-full gap-6 text-white uppercase text-lg tracking-wider">
           {navLinks.map((link) => (
             <Link
