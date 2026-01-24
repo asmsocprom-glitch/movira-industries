@@ -24,105 +24,129 @@ interface ClientProfile {
 
 interface ClientRequest {
   id: string;
-  products: { title: string; quantity: number | string }[];
+  products: { title: string; quantity: number }[];
   status: string;
+  createdAt?: Timestamp;
+}
+
+interface FinalOrderProduct {
+  title: string;
+  quantity: number;
+  price: number;
+  baseTotal: number;
+  margin: number;
+  finalTotal: number;
+}
+
+interface FinalOrder {
+  id: string;
+  clientId: string;
+  clientRequestId: string;
+  products: FinalOrderProduct[];
   createdAt?: Timestamp;
 }
 
 export default function ClientDashboardPage() {
   const { user, isLoaded } = useUser();
+
   const [client, setClient] = useState<ClientProfile | null>(null);
   const [requests, setRequests] = useState<ClientRequest[]>([]);
+  const [orders, setOrders] = useState<FinalOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
 
-    const fetchData = async () => {
-      try {
-        const clientQuery = query(
+    const load = async () => {
+      const clientSnap = await getDocs(
+        query(
           collection(db, "clients"),
           where("clerkUserId", "==", user.id),
           limit(1)
-        );
-        const clientSnap = await getDocs(clientQuery);
+        )
+      );
 
-        if (clientSnap.empty) {
-          setLoading(false);
-          return;
-        }
+      if (clientSnap.empty) {
+        setLoading(false);
+        return;
+      }
 
-        const clientDoc = clientSnap.docs[0];
-        const clientData = clientDoc.data();
+      const clientDoc = clientSnap.docs[0];
+      const clientData = clientDoc.data();
 
-        setClient({
-          id: clientDoc.id,
-          name: clientData.name,
-          email: clientData.email,
-          phone: clientData.phone,
-          address: clientData.address,
-        });
+      setClient({
+        id: clientDoc.id,
+        name: clientData.name,
+        email: clientData.email,
+        phone: clientData.phone,
+        address: clientData.address,
+      });
 
-        const requestQuery = query(
+      const reqSnap = await getDocs(
+        query(
           collection(db, "clientRequests"),
           where("clientId", "==", clientDoc.id),
           orderBy("createdAt", "desc")
-        );
+        )
+      );
 
-        const requestSnap = await getDocs(requestQuery);
-        const requestData: ClientRequest[] = requestSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<ClientRequest, "id">),
-        }));
+      setRequests(
+        reqSnap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<ClientRequest, "id">),
+        })).filter((r) => r.status !== "accepted")
+      );
 
-        setRequests(requestData);
-      } catch (err) {
-        console.error("Client dashboard error:", err);
-      } finally {
-        setLoading(false);
-      }
+      const orderSnap = await getDocs(
+        query(
+          collection(db, "finalOrders"),
+          where("clientId", "==", clientDoc.id),
+        )
+      );
+
+      setOrders(
+        orderSnap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<FinalOrder, "id">),
+        }))
+      );
+
+      setLoading(false);
     };
 
-    fetchData();
+    load();
   }, [isLoaded, user]);
 
-  if (!isLoaded) return null;
-
-  if (!user) {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center font-Manrope">
-        <p>Please sign in to view your dashboard.</p>
+        Loading dashboard...
       </div>
     );
   }
 
-  if (loading) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center font-Manrope">
-        <p>Loading dashboard...</p>
+        Please sign in
       </div>
     );
   }
 
   return (
     <main className="min-h-screen bg-[#f7f6f2] pt-24 pb-16 font-Manrope">
-      <div className="max-w-6xl mx-auto px-4 space-y-10">
-
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h1 className="text-3xl font-semibold tracking-tight">
-              Dashboard
-            </h1>
-
+      <div className="max-w-6xl mx-auto px-4 space-y-12">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-semibold">Dashboard</h1>
           <SignOutButton>
-            <button className="px-4 py-2 text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition">
+            <button className="px-4 py-2 border border-red-500 text-red-600 rounded-lg">
               Logout
             </button>
           </SignOutButton>
         </div>
 
-        {/* PROFILE CARD */}
         {client && (
-          <section className="bg-white border border-[#e6e6e6] rounded-2xl p-6 shadow-sm">
+          <section className="bg-white border rounded-2xl p-6">
             <h2 className="text-xl font-semibold mb-4">My Profile</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-800">
@@ -134,7 +158,6 @@ export default function ClientDashboardPage() {
           </section>
         )}
 
-        {/* REQUESTS */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">My Requests</h2>
@@ -146,58 +169,94 @@ export default function ClientDashboardPage() {
             </Link>
           </div>
 
-          {requests.length === 0 ? (
-            <div className="bg-white border border-dashed rounded-xl p-8 text-center">
-              <p className="text-gray-600 mb-4">
-                You haven’t placed any requests yet.
-              </p>
-              <Link
-                href="/products"
-                className="inline-block px-5 py-2 border border-black text-sm font-medium hover:bg-black hover:text-white transition"
-              >
-                Browse Products
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {requests.map((req) => (
-                <div
-                  key={req.id}
-                  className="bg-white border border-[#e6e6e6] rounded-xl p-5 shadow-sm"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full capitalize font-medium ${
-                        req.status === "pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : req.status === "completed"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {req.status}
-                    </span>
-
-                    {req.createdAt && (
-                      <span className="text-xs text-gray-500">
-                        {req.createdAt.toDate().toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mt-4 space-y-1 text-sm text-gray-800">
-                    {req.products.map((p, i) => (
-                      <p key={i}>
-                        {p.title} <span className="text-gray-500">× {p.quantity}</span>
-                      </p>
-                    ))}
-                  </div>
+          <div className="space-y-4">
+            {requests.map((req) => (
+              <div key={req.id} className="bg-white border rounded-xl p-5">
+                <div className="flex justify-between text-xs text-gray-500 mb-2">
+                  <span className="capitalize">{req.status}</span>
+                  {req.createdAt && (
+                    <span>{req.createdAt.toDate().toLocaleString()}</span>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
+
+                <div className="space-y-1 text-sm">
+                  {req.products.map((p, i) => (
+                    <p key={i}>
+                      {p.title} × {p.quantity}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
+        <section>
+          <h2 className="text-xl font-semibold mb-4">Final Orders</h2>
+
+          <div className="space-y-6">
+            {orders.map((order) => {
+              const supplierTotal = order.products.reduce(
+                (sum, p) => sum + p.baseTotal,
+                0
+              );
+
+              const finalTotal = order.products.reduce(
+                (sum, p) => sum + p.finalTotal,
+                0
+              );
+
+              const totalMargin = order.products.reduce(
+                (sum, p) => sum + p.margin,
+                0
+              );
+
+              return (
+                <div
+                  key={order.id}
+                  className="bg-white border rounded-2xl p-6 space-y-4"
+                >
+                  <div className="space-y-2 text-sm">
+                    {order.products.map((p, i) => (
+                      <div
+                        key={i}
+                        className="flex justify-between border-b pb-2"
+                      >
+                        <div>
+                          <p className="font-medium">{p.title}</p>
+                          <p className="text-xs text-gray-500">
+                            ₹{p.price} × {p.quantity}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p>₹{p.baseTotal}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-4 space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Total</span>
+                      <span>₹{supplierTotal}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Margin</span>
+                      <span className="text-green-600">₹{totalMargin}</span>
+                    </div>
+
+                    <div className="flex justify-between text-lg font-semibold">
+                      <span>Final Total</span>
+                      <span>₹{finalTotal}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </main>
   );

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 
 interface Product {
@@ -18,14 +18,19 @@ interface Product {
 interface FinalOrder {
   id: string;
   supplierRequestId: string;
+  clientId: string;
   supplierEmail: string;
   products: Product[];
   createdAt?: Timestamp;
+}
+interface Client {
+  name: string;
 }
 
 export default function AdminFinalOrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<FinalOrder[]>([]);
+  const [clients, setClients] = useState<Record<string, Client>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,8 +40,15 @@ export default function AdminFinalOrdersPage() {
       const data: FinalOrder[] = snap.docs.map((d) => ({
         id: d.id,
         ...(d.data() as Omit<FinalOrder, "id">),
-      }));
-      setOrders(data);
+      }))
+      setOrders(data)
+      const clientIds = Array.from(new Set(data.map((o) => o.clientId)));
+      const clientCache: Record<string, Client> = {};
+      for (const id of clientIds) {
+        const cSnap = await getDoc(doc(db, "clients", id));
+        if (cSnap.exists()) clientCache[id] = cSnap.data() as Client;
+      }
+      setClients(clientCache);
       setLoading(false);
     };
     fetchOrders();
@@ -53,15 +65,11 @@ export default function AdminFinalOrdersPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#f7f6f2] font-Manrope px-4 sm:px-6 py-10">
+    <div className="min-h-screen bg-[#f7f6f2] font-Manrope px-4 sm:px-6 py-10">
       <div className="max-w-7xl mx-auto space-y-8">
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold">Final Orders</h1>
-            <p className="text-sm text-gray-500">
-              All finalized supplier orders with margins
-            </p>
           </div>
 
           <button
@@ -87,6 +95,7 @@ export default function AdminFinalOrdersPage() {
             (sum, p) => sum + p.margin,
             0
           );
+          const client = clients[order.clientId];
 
           return (
             <div
@@ -94,9 +103,18 @@ export default function AdminFinalOrdersPage() {
               className="bg-white border rounded-2xl shadow-sm overflow-hidden"
             >
               <div className="p-6 border-b bg-gray-50 flex flex-col lg:flex-row lg:justify-between gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Supplier</p>
-                  <p className="font-medium">{order.supplierEmail}</p>
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col lg:flex-row lg:gap-8">
+                    <div>
+                      <p className="text-sm text-gray-500">Supplier</p>
+                      <p className="font-medium">{order.supplierEmail}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Client</p>
+                      <p className="font-medium">{client?.name || order.clientId}</p>
+                    </div>
+                  </div>
+
                   {order.createdAt && (
                     <p className="text-xs text-gray-400 mt-1">
                       {order.createdAt.toDate().toLocaleString()}
@@ -126,43 +144,37 @@ export default function AdminFinalOrdersPage() {
                 </div>
               </div>
 
-              <div className="p-6">
-                <p className="font-medium mb-4">Products</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border overflow-hidden">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="text-left px-4 py-3 border-b">Product</th>
+                      <th className="text-center px-4 py-3 border-b">Quantity</th>
+                      <th className="text-right px-4 py-3 border-b">Per Product Price</th>
+                      <th className="text-right px-4 py-3 border-b">Total Price</th>
+                      <th className="text-right px-4 py-3 border-b">Margin</th>
+                      <th className="text-right px-4 py-3 border-b">Final</th>
+                    </tr>
+                  </thead>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm border rounded-xl overflow-hidden">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="text-left px-4 py-3 border-b">Product</th>
-                        <th className="text-center px-4 py-3 border-b">Quantity</th>
-                        <th className="text-right px-4 py-3 border-b">Per Product Price</th>
-                        <th className="text-right px-4 py-3 border-b">Total Price</th>
-                        <th className="text-right px-4 py-3 border-b">Margin</th>
-                        <th className="text-right px-4 py-3 border-b">Final</th>
+                  <tbody>
+                    {order.products.map((p) => (
+                      <tr
+                        key={p.productId}
+                        className="border-b last:border-none hover:bg-gray-50"
+                      >
+                        <td className="px-4 py-3">{p.title}</td>
+                        <td className="px-4 py-3 text-center">{p.quantity}</td>
+                        <td className="px-4 py-3 text-right">₹{p.price}</td>
+                        <td className="px-4 py-3 text-right">₹{p.baseTotal}</td>
+                        <td className="px-4 py-3 text-right text-yellow-700 font-medium">
+                          ₹{p.margin}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold">₹{p.finalTotal}</td>
                       </tr>
-                    </thead>
-
-                    <tbody>
-                      {order.products.map((p) => (
-                        <tr
-                          key={p.productId}
-                          className="border-b last:border-none hover:bg-gray-50"
-                        >
-                          <td className="px-4 py-3">{p.title}</td>
-                          <td className="px-4 py-3 text-center">{p.quantity}</td>
-                          <td className="px-4 py-3 text-right">₹{p.price}</td>
-                          <td className="px-4 py-3 text-right">₹{p.baseTotal}</td>
-                          <td className="px-4 py-3 text-right text-yellow-700 font-medium">
-                            ₹{p.margin}
-                          </td>
-                          <td className="px-4 py-3 text-right font-semibold">
-                            ₹{p.finalTotal}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           );

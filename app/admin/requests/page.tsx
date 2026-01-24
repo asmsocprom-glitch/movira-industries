@@ -72,7 +72,7 @@ export default function AdminRequestsPage() {
   const handleAccept = async (req: ClientRequest) => {
     if (!confirm("Accept this request and send to suppliers?")) return;
 
-    await updateDoc(doc(db, "clientRequests", req.id), { status: "accepted", acceptedAt: serverTimestamp() });
+    await updateDoc(doc(db, "clientRequests", req.id), { status: "under_approval", acceptedAt: serverTimestamp() });
     await addDoc(collection(db, "supplierRequests"), {
       clientRequestId: req.id,
       clientId: req.clientId,

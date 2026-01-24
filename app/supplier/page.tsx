@@ -229,7 +229,7 @@ export default function SupplierDashboard() {
 
                         <input
                           type="number"
-                          placeholder="Price"
+                          placeholder="Price Per piece"
                           className="w-32 border rounded-lg px-3 py-2 text-sm"
                           value={prices[`${req.id}_${p.productId}`] || ""}
                           onChange={(e) =>

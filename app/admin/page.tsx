@@ -28,6 +28,7 @@ interface Product {
 interface SupplierRequest {
   id: string;
   clientId: string;
+  clientRequestId: string;
   products: Product[];
   status: "pending" | "accepted";
 }
@@ -79,6 +80,7 @@ export default function AdminDashboard() {
         srList.push({
           id: d.id,
           clientId: data.clientId,
+          clientRequestId: data.clientRequestId,
           products: data.products,
           status: data.status,
         });
@@ -112,6 +114,14 @@ export default function AdminDashboard() {
     const margins = marginMap[q.id];
     if (!margins) return alert("Enter margin for each product");
 
+    // ✅ Fetch supplierRequest to get clientRequestId
+    const srSnap = await getDoc(doc(db, "supplierRequests", q.supplierRequestId));
+    if (!srSnap.exists()) {
+      alert("Supplier request not found");
+      return;
+    }
+    const { clientRequestId } = srSnap.data();
+
     const productsWithMargin = q.products.map(p => {
       const margin = Number(margins[p.productId] || 0);
       const baseTotal = (p.price || 0) * p.quantity;
@@ -124,6 +134,7 @@ export default function AdminDashboard() {
     });
 
     await addDoc(collection(db, "finalOrders"), {
+      clientRequestId, // ✅ now valid
       supplierRequestId: q.supplierRequestId,
       clientId: q.clientId,
       supplierEmail: q.supplierEmail,
@@ -140,6 +151,10 @@ export default function AdminDashboard() {
     }
 
     await updateDoc(doc(db, "supplierRequests", q.supplierRequestId), {
+      status: "accepted",
+    });
+
+    await updateDoc(doc(db, "clientRequests", clientRequestId), {
       status: "accepted",
     });
 
@@ -177,8 +192,8 @@ export default function AdminDashboard() {
 
             <SignOutButton>
               <button className="px-4 py-2 text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition">
-              Logout
-            </button>
+                Logout
+              </button>
             </SignOutButton>
           </div>
         </div>
@@ -204,9 +219,7 @@ export default function AdminDashboard() {
                 <div className="mt-4 space-y-4">
                   {qs.map(q => (
                     <div key={q.id} className="bg-gray-50 rounded-xl p-4 border">
-                      <p className="font-medium text-sm mb-3">
-                        {q.supplierEmail}
-                      </p>
+                      <p className="font-medium text-sm mb-3">{q.supplierEmail}</p>
 
                       <div className="space-y-3">
                         {q.products.map(p => (
@@ -250,9 +263,7 @@ export default function AdminDashboard() {
                   ))}
 
                   {qs.length === 0 && (
-                    <p className="text-sm text-gray-500">
-                      No quotations yet
-                    </p>
+                    <p className="text-sm text-gray-500">No quotations yet</p>
                   )}
                 </div>
               </div>
@@ -280,9 +291,7 @@ export default function AdminDashboard() {
                   <p className="font-medium">{p.title}</p>
                   <p className="text-sm">Qty: {p.quantity}</p>
                   {p.variant && <p className="text-sm">Variant: {p.variant}</p>}
-                  {p.specification && (
-                    <p className="text-sm">Spec: {p.specification}</p>
-                  )}
+                  {p.specification && <p className="text-sm">Spec: {p.specification}</p>}
                 </div>
               ))}
             </div>
